@@ -7,9 +7,10 @@ const cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let searchRouter = require("./routes/search")
-let musicRouter = require("./routes/music");
+let musicRouter = require("./routes/song");
 let artistRouter = require("./routes/artist");
 let albumRouter = require("./routes/album");
+let adminRouter = require("./routes/admins/admin")
 var app = express();
 
 // view engine setup
@@ -26,6 +27,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/search',searchRouter);
 app.use("/song",musicRouter);
+app.use("/admin",adminRouter)
+app.use("/artist",artistRouter)
 app.use(cors())
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -43,8 +46,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-const db = require("./databases/DatabaseConnection.js")
-const { connectDB } = require('./databases/DatabaseConnection');
+
 
 
 

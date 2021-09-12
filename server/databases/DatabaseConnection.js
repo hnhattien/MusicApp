@@ -1,20 +1,22 @@
 const mysql = require('mysql')
-const db = mysql.createConnection({
+const util = require('util');
+const pool = mysql.createPool({
     host: "localhost",
     user: 'root',
     password: "",
     database: "MusicSE447"
 })
-const connectDB = ()=>{
-    db.connect((err)=>{
-      if(err){
-        console.log("Connect database error!",err);
-        process.exit();
-      }
-      else{
-        console.log("Connected Database")
-      }
-    })
+pool.getConnection((err,connection) =>{
+  if(err){
+    if(err.code === 'PROTOCOL_CONNECTION_LOST'){
+      console.error("Database connection was closed");
+    }
   }
-module.exports.connectDB = connectDB
-module.exports = db;
+  if(connection){
+    connection.release();
+  }
+})
+
+pool.query = util.promisify(pool.query);
+
+module.exports = pool;
