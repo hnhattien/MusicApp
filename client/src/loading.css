@@ -1,0 +1,15 @@
+.loading-container{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+
+.spinner-wrap{
+    font-size: 4rem;
+}
+
+.spinner-wrap span{
+    font-size: 4rem;
+}

@@ -16,10 +16,13 @@ code {
 *{
   color: white;
 }
+
 a:hover{
-  
+  color: white !important;
+ 
 }
-a{
+
+div.all-tool-wrap a{
   display: inline-block;
   color: white;
 
@@ -33,7 +36,7 @@ a{
   background-position: 100%;
 }
 
-a:hover{
+div.all-tool-wrap a:hover{
   
 
 
@@ -41,3 +44,12 @@ a:hover{
 
   
 }
+
+a{
+  text-decoration: none !important;
+  transition-property: color;
+  transition-duration: 100ms;
+  transition-timing-function: linear;
+  transition-delay: 200ms;
+}
+

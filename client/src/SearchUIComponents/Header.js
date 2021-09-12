@@ -8,9 +8,11 @@ export class Header extends Component {
 
     render(){
         return(
-            <header style={{height: "64px"}} className="pt-3">
-                {this.props.children}
-            </header>
+            <div className="row">
+                <header style={{height: "64px"}} className="pt-3">
+                    {this.props.children}
+                </header>
+            </div>
         )
     }
 }

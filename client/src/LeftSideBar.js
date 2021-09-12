@@ -5,7 +5,7 @@ import { MusicMenu } from './MusicMenu';
 export class LeftSideBar extends Component{
     render(){
         return(
-            <div className="col-2 d-none d-sm-block menu-wrap fixed-width left-side-bar vh-100 top-0 bg-dark p-0">
+            <div className="col-2 all-tool-wrap d-none d-sm-block menu-wrap fixed-width left-side-bar vh-100 top-0 bg-dark p-0">
                  <Logo>
                  </Logo>
                  <MemberToolMenu>
