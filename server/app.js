@@ -10,8 +10,14 @@ let searchRouter = require("./routes/search")
 let musicRouter = require("./routes/song");
 let artistRouter = require("./routes/artist");
 let albumRouter = require("./routes/album");
-let adminRouter = require("./routes/admins/admin")
+let adminRouter = require("./routes/admins/admin");
+const session = require('express-session');
+const passport = require('./authenticate/PassportInit');
+
 var app = express();
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

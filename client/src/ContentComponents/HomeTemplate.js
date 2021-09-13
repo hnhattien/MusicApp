@@ -19,9 +19,9 @@ export class HomeTemplate extends Component {
     render(){
         
         return <Suspense fallback={<Loading></Loading>}>
-            <MusicTemplate {...this.props} isHome={true} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} musics={this.props.playlist}>
+            {/* <MusicTemplate {...this.props} isHome={true} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} musics={this.props.playlist}>
             
-            </MusicTemplate>
+            </MusicTemplate> */}
         </Suspense>
     }
 }

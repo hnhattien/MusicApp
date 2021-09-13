@@ -5,7 +5,7 @@ import './App.css';
 import {RightSideBar} from './RightSideBar';
 import {LeftSideBar} from './LeftSideBar';
 import { MainContent } from './MainContent';
-
+import '@popperjs/core/dist/umd/popper'
 export class App extends Component {
   constructor(props){
     super(props);
