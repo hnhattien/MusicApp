@@ -1,5 +1,5 @@
 import React, { Component,Suspense } from 'react';
-import {Loading} from '../Loading.js';
+import {Loading} from '../LoadingComponents/Loading.js';
 const MusicTemplate = React.lazy(()=> import("./MusicTemplate.js").then(module=>({default: module.MusicTemplate})));
 
 

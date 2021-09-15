@@ -11,14 +11,32 @@ let musicRouter = require("./routes/song");
 let artistRouter = require("./routes/artist");
 let albumRouter = require("./routes/album");
 let adminRouter = require("./routes/admins/admin");
-const session = require('express-session');
-const passport = require('./authenticate/PassportInit');
-
+let authRouter = require('./routes/auth/auth.js');
+var passport = require('passport')
+let flash = require('express-flash');
 var app = express();
-
+const expressSession = require('express-session');
+app.use(flash());
+const session = {
+  secret: `secretcode`,
+  cookie: {path: '/', originalMaxAge: 50000000},
+  resave: false,
+  saveUninitialized: false
+};
+app.use(expressSession(session));
+app.use(cookieParser("secretcode"));
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}))
 app.use(passport.initialize());
 app.use(passport.session());
 
+const initPassport = require('./authenticate/PassportInit');
+
+
+
+initPassport(passport);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -35,7 +53,8 @@ app.use('/search',searchRouter);
 app.use("/song",musicRouter);
 app.use("/admin",adminRouter)
 app.use("/artist",artistRouter)
-app.use(cors())
+app.use("/auth", authRouter);
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -56,5 +75,5 @@ app.use(function(err, req, res, next) {
 
 
 
-
 module.exports = app;
+

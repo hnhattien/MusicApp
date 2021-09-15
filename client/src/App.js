@@ -5,12 +5,13 @@ import './App.css';
 import {RightSideBar} from './RightSideBar';
 import {LeftSideBar} from './LeftSideBar';
 import { MainContent } from './MainContent';
-import '@popperjs/core/dist/umd/popper'
+
 export class App extends Component {
   constructor(props){
     super(props);
     this.audioRef = React.createRef();
     this.state = {
+      isLogin: window.localStorage.getItem("userid") !== null,
       sitemap : [],
       currentMusic : null,
       isLoging: false,
@@ -23,6 +24,25 @@ export class App extends Component {
       playlist: [],
     }
   }
+
+  // componentWillMount = () => {
+  //   fetch('/loginstatus').then(result=>{
+  //     console.log(result);
+  //       return result.json();
+  //   }).then(data=>{
+  //     console.log(data)
+  //     if(data.user){
+        
+  //       this.setState({user: data.user});
+  //     }
+  //     else{
+  //       this.setState({user: null});
+  //     }
+  //   }).catch(err=>{
+  //     console.log(err);
+  //   })
+  // }
+  
   setPlaylist = (data)=>{
     this.setState({playlist: data})
   }
@@ -30,11 +50,13 @@ export class App extends Component {
     fetch("/index").then(res=>{
         return res.json();
     }).then(data=>{
-      this.setState({
-        newestMusics: [...data['musics'],...data['usermusics']]
-      },()=>{
-        this.setPlaylist([...data['musics'],...data['usermusics']]);
-      }) 
+      if(data['musics'] && data['usermusics']){
+        this.setState({
+          newestMusics: [...data['musics'],...data['usermusics']]
+        },()=>{
+          this.setPlaylist([...data['musics'],...data['usermusics']]);
+        })
+      } 
     }) 
   }
   setCurrentMusic = (data)=>{
@@ -43,7 +65,6 @@ export class App extends Component {
         this.audioRef.current.currentTime = 0;
       }
       this.playMusic();
-      console.log("Musi ", this);
     });
   }
   requestPlayMusicFromSlug = (slug)=>{
@@ -53,8 +74,7 @@ export class App extends Component {
     let targetMusic = this.state.playlist.filter(music=>music['music_slug'] === slug)[0];
     this.setCurrentMusic(targetMusic);
   }
-  playMusic = 
-  ()=>{
+  playMusic = ()=>{
     if(this.state.currentMusic){
       this.audioRef.current.src = `/upload/musics/audio/${this.state.currentMusic.audio}`;
       this.setPlayState();
@@ -195,14 +215,22 @@ setDuration = ()=>{
       this.setPauseState();
     } 
   }
-  render(){
+  //User
+  setLoginState = () => {
+    this.setState({isLogin: true});
+  }
 
+  setLogoutState = () => {
+    this.setState({isLogin: false});
+  }
+  render(){
+    
     return (
       <div className="container-fluid bg-dark">
         <div className="row">
               <Router>
-                <LeftSideBar/>
-                <MainContent setPlaylist={this.setPlaylist} playlist={this.state.playlist} fetchHomeData={this.fetchNewestMusics} requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
+                <LeftSideBar isLogin={this.state.isLogin}/>
+                <MainContent setLoginState={this.setLoginState} setLogoutState={this.setLogoutState} setPlaylist={this.setPlaylist} playlist={this.state.playlist} fetchHomeData={this.fetchNewestMusics} requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
                 <RightSideBar 
                  peekHanlde={this.peekHandle}
                  isPlay={this.state.isPlay} 

@@ -1,20 +1,59 @@
+
+const db = require('../databases/DatabaseConnection');
+
 const LocalStrategy = require("passport-local").Strategy;
-const passport =require('passport');
+const bcrypt = require('bcrypt');
 
-passport.use(new LocalStrategy({
-    usernameField: 'username',
-    passwordField: 'password'
-},
-    function(username, password, done){
-        User.findOne({username: username}, function(err, user){
-            if(err) return done(err);
-            if(!user) return done(null,false,{message: 'Incorrect username'});
-            if(!user.validPassword(password)){
-                return done(null, false, { message: 'Password Incorrect'})
+const initPassport = (passport)=>{
+    passport.use(new LocalStrategy({
+        usernameField: 'username',
+        passwordField: 'password'
+      },
+        function(username, password, done){
+            console.log("new local");
+          console.log(username,password);
+            db.query(`SELECT * FROM user WHERE username = ?`,[username]).then(result=>{
+                if(result.length === 0){
+                    return done(null,false,{message: "Incorrect username."});
+                }
+                else{
+                    bcrypt.compare(password, result[0]['password'],(err, res)=>{
+                        if(err) return done(err);
+                        if(res === false){ return done(null,false,{message: "Incorrect password."})}
+                        return done(null, result[0], {message: "Login success"});
+                    })
+                    
+                }
+            }).catch(err=>{
+                console.log(err);
+                return done(err);
+            })
+            
+        }
+      ))
+
+
+
+      passport.serializeUser((user, done)=>{
+        console.log("seeserialize")
+        done(null, user.id);
+      })
+      
+      passport.deserializeUser((id, done)=>{
+        console.log("deserialize")
+        db.query(`SELECT id,avatar, username, email FROM user WHERE id=?`,[id]).then((result)=>{
+          console.log(result);
+            if(result.length !== 0){
+              done(null, result[0]);
             }
-            return done(null, user);
+            else{
+              done(err, false);
+            }
+        }).catch(err=>{
+          console.log(err);
         })
-    }
-))
+      })
 
-module.exports = passport;
+
+}  
+module.exports = initPassport;
