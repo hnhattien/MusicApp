@@ -3,14 +3,20 @@ import React, { Component } from 'react';
 import {BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
 import './App.css';
 import {RightSideBar} from './RightSideBar';
-import {LeftSideBar} from './LeftSideBar';
+import {LeftSideBar} from './LeftSideBarComponents/LeftSideBar';
 import { MainContent } from './MainContent';
+import {MessageBox} from './MessageComponents/MessageBox';
+import {Loading} from './LoadingComponents/Loading';
 
 export class App extends Component {
   constructor(props){
     super(props);
     this.audioRef = React.createRef();
     this.state = {
+      user: {
+        nickname: '',
+        avatar: ''
+      },
       isLogin: window.localStorage.getItem("userid") !== null,
       sitemap : [],
       currentMusic : null,
@@ -20,11 +26,22 @@ export class App extends Component {
       isRandom: false,
       currentTime: 0,
       duration: 0,
-      newestMusics: [],
+      newMusics: [],
       playlist: [],
+      //Loading
+      loading: {
+        isLoad: false,
+        position: {x: 0, y: 0}
+      },
+      //Message
+      messageAlert: {
+        isShowMessage: false,
+        messageProps: {type:"success",text: "", position: {x: "50%", y: "50%"}},
+      }
+      
     }
   }
-
+  
   // componentWillMount = () => {
   //   fetch('/loginstatus').then(result=>{
   //     console.log(result);
@@ -44,20 +61,32 @@ export class App extends Component {
   // }
   
   setPlaylist = (data)=>{
-    this.setState({playlist: data})
+    this.setState({playlist: data,newMusics: data},()=>{
+      this.toggleLoading(false);
+    })
   }
-  fetchNewestMusics = ()=>{
-    fetch("/index").then(res=>{
+  fetchNewestMusics = async ()=>{
+    // if(this.state.playlist.length === 0){
+    //   this.toggleLoading(true);
+    // }
+    await fetch("/index" ).then(res=>{
         return res.json();
     }).then(data=>{
-      if(data['musics'] && data['usermusics']){
-        this.setState({
-          newestMusics: [...data['musics'],...data['usermusics']]
-        },()=>{
-          this.setPlaylist([...data['musics'],...data['usermusics']]);
-        })
-      } 
-    }) 
+
+      if(data['musics']){
+        if(this.state.currentMusic === null){
+          this.setState({
+            currentMusic: data['musics'][data['musics'].length-1],
+            newMusics: data['musics']
+          },()=>{
+            console.log(this.state.newMusics)
+          })
+        }
+       
+        this.setPlaylist([...data['musics'].reverse()])
+       
+      }     
+    })
   }
   setCurrentMusic = (data)=>{
     this.setState({currentMusic: data,currentTime: 0},()=>{
@@ -170,15 +199,16 @@ setDuration = ()=>{
     this.setCurrentMusic(music);
   }
   forwardHandle = (ev) =>{
-      if(this.state.currentTime < this.state.duration){
-        if(this.audioRef.current){
-          this.audioRef.current.currentTime = this.state.currentTime + 10;
-        }
-      }
+      
+    if(this.state.isRandom){
+      this.setRandomSong();
+    }
+        // if(this.audioRef.current){
+        //   this.audioRef.current.currentTime = this.state.currentTime + 10;
+        // }
       else{
-        if(this.state.isRandom){
-          this.setRandomSong();
-        }
+        let nextMusic = this.state.playlist[this.state.playlist.indexOf(this.state.currentMusic)+1];
+        this.setCurrentMusic(nextMusic);   
       }
     
     
@@ -186,20 +216,50 @@ setDuration = ()=>{
   }
   backwardHandle = (ev) =>{
 
-      if(this.state.currentTime > 0){
-        if(this.audioRef.current){
-          this.audioRef.current.currentTime = this.state.currentTime - 10;
-        }
-      }
-      else{
+      
         if(this.state.isRandom){
           this.setRandomSong();
         }
+      
+      
+      else{
+        let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
+        if( currentMusicIndex === 0){
+          this.setCurrentMusic(this.state.playlist[0]);
+        }
+        else{
+          this.setCurrentMusic(this.state.playlist[currentMusicIndex - 1]);
+        }
+        
       }
   }
+  updateViewCount = (music) => {
+    console.log(music.id, "Hi")
+    fetch('/song/updateview',{
+       method : "POST",
+       headers: {
+         "Accept": "application/json",
+         "Content-Type": "application/json"
+       },
+       body: JSON.stringify({
+         musicId: music.id
+       })
+     }).then(res=>{
+       return res.json();
+     }).then(dataRes => {
+       console.log(dataRes);
+     }).catch(err=>{
+       console.log(err);
+     })
+     console.log("Music");
+  }
   endedHandle = ()=>{
+    console.log("End");
+    this.updateViewCount(this.state.currentMusic);
     if(this.state.isLoop === true){
-      this.audioRef.current.play();
+      this.audioRef.current.play().catch(err=>{
+        console.log(err);
+      });
     }
     else if(this.state.isRandom === true){
       this.setRandomSong();
@@ -216,43 +276,117 @@ setDuration = ()=>{
     } 
   }
   //User
-  setLoginState = () => {
-    this.setState({isLogin: true});
+  setLoginState = (user) => {
+    console.log(user);
+    this.setState({user: {nickname: user.nickname, avatar: user.avatar}});
   }
-
+ 
+  updateUserChanges = () => {
+    this.toggleLoading(true);
+    fetch('/auth/loginstatus').then(res=>{
+      return res.json();
+    }).then(data=>{
+      console.log(data);
+      if(data.isLogin === true){
+        localStorage.setItem("userid",data.id);
+        console.log(data)
+        this.setState({user:{nickname: data.nickname,avatar: data.avatar}});
+      }
+      else{
+        localStorage.removeItem("userid");
+      }
+    }).catch(err=>{
+      this.showMessage(true,String(err),"danger");
+    }).then(()=>{
+      this.toggleLoading(false);
+      setTimeout(()=>{
+        this.showMessage(false);
+      },500)
+    })
+  }
+  checkLoginStatus = () => {
+    this.toggleLoading(true);
+    fetch('/auth/loginstatus').then(res=>{
+      return res.json();
+    }).then(data=>{
+      console.log(data);
+      if(data.isLogin === true){
+        localStorage.setItem("userid",data.id);
+        console.log(data)
+        this.setState({user:{nickname: data.nickname,avatar: data.avatar}});
+      }
+      else{
+        localStorage.removeItem("userid");
+      }
+    }).catch(err=>{
+      this.showMessage(true,String(err),"danger");
+    }).then(()=>{
+      this.toggleLoading(false);
+      setTimeout(()=>{
+        this.showMessage(false);
+      },2000)
+    })
+  }
+  componentDidMount = () => {
+    this.checkLoginStatus();
+  }
   setLogoutState = () => {
     this.setState({isLogin: false});
+  }
+  
+  //Loading
+  toggleLoading = (isLoad,position={x:"50%",y:"50%"}) => {
+    this.setState({loading: {isLoad: isLoad, position}});
+  }
+  //Message Alert
+  showMessage = (isShowMessage,text="",type,position={x:"50%",y:"50%"}) => {
+    this.setState({messageAlert: {isShowMessage,messageProps:{text,type,position}}});
   }
   render(){
     
     return (
+      <Router>
+     
       <div className="container-fluid bg-dark">
-        <div className="row">
-              <Router>
-                <LeftSideBar isLogin={this.state.isLogin}/>
-                <MainContent setLoginState={this.setLoginState} setLogoutState={this.setLogoutState} setPlaylist={this.setPlaylist} playlist={this.state.playlist} fetchHomeData={this.fetchNewestMusics} requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
-                <RightSideBar 
-                 peekHanlde={this.peekHandle}
-                 isPlay={this.state.isPlay} 
-                 isLoop={this.state.isLoop} 
-                 isRandom={this.state.isRandom} 
-                 currentMusic={this.state.currentMusic}
-                 setPlayState={this.setPlayState}
-                 setPauseState={this.setPauseState}
-                 toggleLoop={this.toggleLoop}
-                 toggleRandom={this.toggleRandom}
-                 currentTime={this.state.currentTime}
-                 duration={this.state.duration}
-                 cancelMouseHold={this.cancelMouseHold}
-                 forwardHandle={this.forwardHandle}
-                 
-                 backwardHandle={this.backwardHandle}
-                 />
-              </Router>
-            
+        {this.state.loading.isLoad && <Loading position={this.state.loading.position}></Loading>}
+        {this.state.messageAlert.isShowMessage && <MessageBox text={this.state.messageAlert.messageProps.text} position={this.state.messageAlert.messageProps.position} type={this.state.messageAlert.messageProps.type}></MessageBox>}  
+        <div className="row position-relative">
+        
+      <LeftSideBar updateUserChanges={this.updateUserChanges} user={this.state.user} logoutUser={this.logoutUser} toggleLoading={this.toggleLoading} showMessage={this.showMessage} />
+      <MainContent updateUserChanges={this.updateUserChanges} 
+      user={this.state.user} 
+      toggleLoading={this.toggleLoading} 
+      showMessage={this.showMessage} 
+      setLoginState={this.setLoginState} 
+      setLogoutState={this.setLogoutState} 
+      setPlaylist={this.setPlaylist} 
+      newMusics={this.state.newMusics}
+      playlist={this.state.playlist} 
+      fetchHomeData={this.fetchNewestMusics} 
+      requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
+
+      <RightSideBar 
+      peekHanlde={this.peekHandle}
+      isPlay={this.state.isPlay} 
+      isLoop={this.state.isLoop} 
+      isRandom={this.state.isRandom} 
+      currentMusic={this.state.currentMusic}
+      setPlayState={this.setPlayState}
+      setPauseState={this.setPauseState}
+      toggleLoop={this.toggleLoop}
+      toggleRandom={this.toggleRandom}
+      currentTime={this.state.currentTime}
+      duration={this.state.duration}
+      cancelMouseHold={this.cancelMouseHold}
+      forwardHandle={this.forwardHandle}
+      
+      backwardHandle={this.backwardHandle}
+      />
+
         </div>
-        <audio onEnded={this.endedHandle} onTimeUpdate={this.updateCurrentTime} onLoadedMetadata={this.setDuration}  loop={this.props.isLoop} ref={this.audioRef}> </audio> 
+        <audio onError={this.forwardHandle} onEnded={this.endedHandle} onTimeUpdate={this.updateCurrentTime} onLoadedMetadata={this.setDuration}  loop={this.props.isLoop} ref={this.audioRef}> </audio> 
       </div>
+      </Router>
     );
   }
 }

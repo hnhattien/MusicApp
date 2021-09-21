@@ -58,7 +58,8 @@ class LoginForm extends Component{
           else if(data.user){
             window.localStorage.setItem("userid",data.user.id);
             this.props.showMessage(true,String(data.message),"success",{x:"40%",y:"60%"});
-            this.props.setLoginState(); 
+            console.log(data);
+            this.props.setLoginState(data.user); 
             this.props.history.push("/");
             this.props.toggleLoading(true,{x:"50%",y:"50%"});
           }
@@ -73,13 +74,11 @@ class LoginForm extends Component{
         }).then(()=>{
             setTimeout(()=>{
                 this.props.showMessage(false);
-            },2000);
+            },1000);
             this.props.toggleLoading(false);
         })
       }
-    logoutUser = () => {
-        this.props.setLogoutState();
-    }
+    
     
     render(){
         return(

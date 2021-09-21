@@ -1,0 +1,140 @@
+.avatar-wrap img{
+    width: 100px;
+    height: 100px;
+}
+
+.info-acc-button{
+    font-size: 2rem;
+    padding: 10px;
+    border-radius: 100px 100px;
+}
+.profile-header{
+    display: flex;
+    flex-flow: row;
+    justify-content: space-between;
+    align-content: middle;
+}
+.profile-info-acc-button-wrap{
+    margin: auto 0;
+}
+.info-acc-button:hover{
+    background-color: rgba(10,10,10,0.2)
+}
+.setting-avatar-customize-button-wrap{
+    right: 20px;
+    bottom: 0px;
+    transition: all linear;
+    transition-delay: 10ms;
+    transition-duration: 50ms;
+}
+
+.setting-avatar-customize-button-wrap .setting-avatar-customize-button{
+    font-size: 2rem;
+    color: black;
+    padding: 10px;
+    border-radius: 50px;
+    background-color: #ffffff;
+    
+}
+.setting-avatar-customize-button-wrap:hover{
+
+ 
+}
+.profile-info-acc-button-wrap{
+    
+}
+.setting-avatar{
+    width: 200px;
+    height: 200px;
+}
+
+.popup-wrapper{
+    height: 1000px;
+    
+    position: absolute;
+    top: 20px;
+    
+    border-radius: 10px;
+}
+.popup-inner{
+    margin: auto;
+    height: fit-content;
+    
+}
+.save-btn-wrap{
+    margin-top: 50px;
+    text-align: right;
+    margin-right: 50px;
+}
+.setting-avatar-placeholder-wrap{
+    width: 250px;
+    height: 250px;
+    position: relative;
+    
+    background-color: rgba(255,255,255,1);
+}
+.customize-avatar-popup-title{
+    text-align: center;
+    height: 70px;
+
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+
+}
+.setting-avatar-placeholder{
+    width: 100%;
+    height: 100%;
+
+}
+.setting-avatar-crop-scope{
+    
+    width: 250px;
+    height: 250px;
+    background-image: radial-gradient(rgba(10,10,10,0) 70%, rgba(255,255,255,0.6) 50%);
+    
+    position: absolute;
+    top: 0;
+
+}
+.avatar-customize-menu li{
+    width: 200px;
+}
+.avatar-customize-menu li *{
+   color: black !important;
+   user-select: none;
+}
+
+.avatar-customize-menu li:hover{
+    transform: none;
+}
+
+.setting-avatar-placeholder-wrap{
+
+}
+
+.tool-btn span{
+    font-size: 40px;
+    height: 40px;
+    margin-bottom: 0 !important; 
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    display: inline-block;
+    margin-bottom: 10px;
+}
+.tool-btn span i{
+    font-size: 30px;
+    color: white;
+}
+.tool-btn{
+    background-color: rgba(50,50,50,0.4);
+    border-radius: 50%;
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    
+}
+

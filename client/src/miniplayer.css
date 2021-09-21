@@ -1,0 +1,26 @@
+.mini-player{
+    width: 150px !important;
+    background-color: rgba(10,10,10,0.5);
+    color: black;
+    right: 10px;
+    padding-right: 20px;
+    padding-left: 20px;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+  }
+  .song-info h4{
+    height: 100%;
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px !important;
+  }
+  .mini-player i{
+    font-size: 20px;
+  }
+  .mini-music-controller{
+    display: flex;
+    justify-content: space-around;
+    flex-grow: 0.4;
+  }

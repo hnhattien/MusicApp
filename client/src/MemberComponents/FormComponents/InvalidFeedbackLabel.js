@@ -8,8 +8,8 @@ export class InvalidFeedbackLabel extends Component {
     render(){
 
         return(
-            <small style={{color: "#dc3545"}} className="invalidfeedback">
-               {this.props.text}
+            <small style={{color: "#dc3545", height: "20px"}} className="invalidfeedback">
+               {this.props.validator.isValid === false && this.props.validator.text}
             </small>
         )
     }

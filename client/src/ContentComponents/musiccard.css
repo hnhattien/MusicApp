@@ -1,0 +1,324 @@
+ /* Extra large devices (large laptops and desktops, 1200px and up) */
+ @media only screen and (min-width: 1201px) {
+  .play-music-icon-overlay{
+    font-size: 2rem;
+    cursor: pointer;
+    transition-property: transform;
+    transition-duration: 100ms;
+    transition-delay: 50ms;
+    transition-timing-function: linear;
+  }
+  .play-music-icon-overlay:hover{
+    transform: scale(2,2);
+  }
+  /* .music-thumbnail{
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 200px !important;
+    max-height: 200px;
+    
+  }  */
+
+div.top-info{
+    display: flex;
+    justify-content: space-between;
+}
+div.thumbnail-wrap{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+/* .music-wrap{
+  width: 250px;
+} */
+.music{
+    width: 100%;
+    height: 100%;
+    max-width: 200px !important;
+    max-height: 200px !important;
+}
+div.overlay{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+.card-title{
+  max-width: 100%;
+  width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-title span, .card-title a {
+
+
+}
+} 
+
+
+
+ 
+ 
+ 
+ 
+
+
+.music-wrap{
+  margin-right: 10px !important;
+}
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (max-width: 1200px) {
+  .play-music-icon-overlay{
+    font-size: 2rem;
+    cursor: pointer;
+    transition-property: transform;
+    transition-duration: 100ms;
+    transition-delay: 50ms;
+    transition-timing-function: linear;
+  }
+  .play-music-icon-overlay:hover{
+    transform: scale(2,2);
+  }
+  /* .music-thumbnail{
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 200px !important;
+    max-height: 200px;
+    
+  }  */
+
+div.top-info{
+    display: flex;
+    justify-content: space-between;
+}
+div.thumbnail-wrap{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+/* .music-wrap{
+    width: calc(100vw/5.9);
+} */
+.music{
+    width: 90%;
+    height:100%;
+    max-width: 200px !important;
+    max-height: 200px !important;
+}
+div.overlay{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+.card-title{
+  max-width: 100%;
+  width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-title span, .card-title a {
+
+
+}
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (max-width: 1024px) {
+  .play-music-icon-overlay{
+    font-size: 2rem;
+    cursor: pointer;
+    transition-property: transform;
+    transition-duration: 100ms;
+    transition-delay: 50ms;
+    transition-timing-function: linear;
+  }
+  .play-music-icon-overlay:hover{
+    transform: scale(2,2);
+  }
+  /* .music-thumbnail{
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 200px !important;
+    max-height: 200px;
+    
+  }  */
+
+div.top-info{
+    display: flex;
+    justify-content: space-between;
+}
+div.thumbnail-wrap{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+/* .music-wrap{
+  width: calc(100vw/5.9);
+} */
+.music{
+    width: 90%;
+    height:100%;
+    max-width: 200px !important;
+    max-height: 200px !important;
+}
+div.overlay{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+.card-title{
+  max-width: 100%;
+  width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-title span, .card-title a {
+
+
+}
+ }
+ 
+
+ /* Small devices (portrait tablets and large phones, 600px and up) */
+ @media only screen and (max-width: 768px) {
+  .play-music-icon-overlay{
+    font-size: 2rem;
+    cursor: pointer;
+    transition-property: transform;
+    transition-duration: 100ms;
+    transition-delay: 50ms;
+    transition-timing-function: linear;
+  }
+  .play-music-icon-overlay:hover{
+    transform: scale(2,2);
+  }
+  /* .music-thumbnail{
+    min-width: 120px;
+    min-height: 120px;
+    max-width: 200px !important;
+    max-height: 200px;
+    
+  }  */
+
+div.top-info{
+    display: flex;
+    justify-content: space-between;
+}
+div.thumbnail-wrap{
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+/* .music-wrap{
+    width: calc(100vw/5.9);
+} */
+.music{
+    width: 90%;
+    height:100%;
+    max-width: 200px !important;
+    max-height: 200px !important;
+}
+div.overlay{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+}
+.card-title{
+  max-width: 100%;
+  width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card-title span, .card-title a {
+
+
+}
+}
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 480px) {
+ 
+}
+
+.play-music-icon-overlay{
+  font-size: 2rem;
+  cursor: pointer;
+  transition-property: transform;
+  transition-duration: 100ms;
+  transition-delay: 50ms;
+  transition-timing-function: linear;
+}
+.play-music-icon-overlay:hover{
+  transform: scale(2,2);
+}
+/* .music-thumbnail{
+  min-width: 120px;
+  min-height: 120px;
+  max-width: 200px !important;
+  max-height: 200px;
+  
+}  */
+
+div.top-info{
+  display: flex;
+  justify-content: space-between;
+}
+div.thumbnail-wrap{
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+/* .music-wrap{
+  width: calc(100vw/5.9);
+} */
+.music{
+  width: 90%;
+  height:100%;
+  max-width: 200px !important;
+  max-height: 200px !important;
+}
+div.overlay{
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+}
+.card-title{
+max-width: 100%;
+width: fit-content;
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+.card-title span, .card-title a {
+
+
+}

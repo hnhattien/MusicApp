@@ -11,59 +11,88 @@ import {Loading} from './LoadingComponents/Loading';
 import { LoginTemplate } from './MemberComponents/LoginTemplate';
 import { SignupTemplate } from './MemberComponents/SignupTemplate';
 import {MessageBox} from './MessageComponents/MessageBox';
+import Profile from './Profile/Profile';
+import PrivateRoute from './PrivateRoute';
+import ProfileSetting from './Profile/ProfileSetting';
+import UploadTemplate from './ContentComponents/UploadTemplate';
+import NewestMusicComponent from './NewestMusicComponent';
 export class MainContent extends Component {
     constructor(props){
         super(props);
         this.state = {
-            isLoad: false,
-            isShowMessage: false,
-            message: {type:"",text: "", position: {x: "50%", y: "50%"}},
-            load: {position: {x: 0, y: 0}}
+           categories: []
 
         }
     }
-    toggleLoading = (isLoad,position={x:"50%",y:"50%"}) => {
-        this.setState({isLoad: isLoad,load: {position}});
+    getCategories = () => {
+        fetch('/category/').then((res)=>{
+            return res.json();
+        }).then(dataRes => {
+            if(dataRes.error){
+               this.props.showMessage(true,dataRes.error.message,"danger");
+            }
+            else{
+                this.setState({
+                    categories: dataRes
+                })
+            }
+            
+        }).catch(err=>{
+            this.props.showMessage(true,String(err),"danger");
+        }).then(()=>{
+            setTimeout(() => {
+                this.props.showMessage(false,);
+            },1000);
+        })
     }
-    showMessage = (isShowMessage,text="",type,position={x:"50%",y:"50%"}) => {
-        this.setState({isShowMessage,message:{text,type,position}});
+    componentDidMount = () => {
+        this.getCategories();
     }
     render(){
         
         return (
             
-            <div className="col-7 bg-dark p-0 position-relative">
+            <div className="col bg-dark p-0 position-relative">
                 <Switch>
-                    <Route path='/' exact={true} render={(routeProps)=><HomeTemplate {...this.props} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} toggleLoading={this.toggleLoading}></HomeTemplate>
+                    <Route path='/' exact={true} render={(routeProps)=><HomeTemplate {...this.props} ></HomeTemplate>
                     }>
                         
                     </Route>
                     <Route path="/search" exact={true} 
                     render={(routeProps)=>{
-                        return <><SearchTemplate setPlaylist={this.props.setPlaylist} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} toggleLoading={this.toggleLoading}/>
+                        return <><SearchTemplate {...this.props}/>
                         </>
                     }
                     }>
 
                     </Route>
-                    <Route path="/rank" exact={true} render={(routeProps)=><RankTemplate toggleLoading={this.toggleLoading}></RankTemplate>}>
+                    <Route path="/rank" exact={true} render={(routeProps)=><RankTemplate {...this.props}></RankTemplate>}>
 
                     </Route>
-                    <Route path="/discover" exact={true} render={(routeProps)=><DiscoverTemplate toggleLoading={this.toggleLoading}></DiscoverTemplate>}></Route>
+                    <Route path="/discover" exact={true} render={(routeProps)=><DiscoverTemplate {...this.props}></DiscoverTemplate>}></Route>
                     <Route path="/song/:song" exact={true} render={(routeProps)=>{
                        
-                    return <MusicInfoTemplate musicslug={routeProps.match.url} toggleLoading={this.toggleLoading}></MusicInfoTemplate>
+                    return <MusicInfoTemplate {...this.props} musicSlug={routeProps.match.url}></MusicInfoTemplate>
                     }} ></Route>
 
-                    <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...this.props} toggleLoading={this.toggleLoading} showMessage={this.showMessage}></LoginTemplate>}></Route>
-                    <Route path="/signup" component={SignupTemplate} exact={true}></Route>
-                    <Route component={NotFound404}></Route>
+                    <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...this.props}></LoginTemplate>}></Route>
+                    <Route path="/signup" render={(routeProps) => <SignupTemplate {...this.props}/>} exact={true}></Route>
+                    <PrivateRoute componentProps={this.props} component={ProfileSetting} path={'/profile/setting'} auth={localStorage.getItem("userid") !== null} ></PrivateRoute>
+                    <PrivateRoute componentProps={this.props} component={Profile} path={'/profile'} auth={localStorage.getItem("userid") !== null}/>
+                    <Route path="/upload" exact={true} render={(routerProps) => {
+                        console.log(this.state.categories);
+                        return <UploadTemplate categories={this.state.categories} {...this.props} /> ;
+                    }} 
+                    />
+                    <Route path="/newest" exact={true} render={()=>{
+                          return <NewestMusicComponent {...this.props}></NewestMusicComponent>
+                    }}>
+                    </Route>
                     <Redirect from='/home' to='/' exact={true}></Redirect>
                     
 
                 </Switch>
-                {this.state.isLoad && <Loading position={this.state.load.position}></Loading>}
-                {this.state.isShowMessage && <MessageBox text={this.state.message.text} position={this.state.message.position} type={this.state.message.type}></MessageBox>}  
+                
                 
             </div>
            

@@ -1,0 +1,55 @@
+.slide{
+    
+    position: absolute;
+    
+}
+.new-songs-link-wrap{
+  
+}
+.top-slide{
+    width: 100%;
+    text-align: right;
+}
+.slide-wrap{
+    max-height: 400px;
+}
+.control-slide-btn-wrap {
+    right: 0;
+    text-align: right;
+    
+}
+.slide-btn{
+    font-size: 30px;
+    margin-right: 20px;
+}
+.next-slide{
+    right: 100px;
+    animation: nextslide;
+    animation-timing-function: linear ease;
+    animation-duration: 500ms;
+    animation-delay: 100ms;
+}
+
+.slide-list-wrap{
+    overflow: hidden;
+}
+.slide-list-wrap ul{
+   
+}
+.new-music-slider-wrap{
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border: 1px solid rgba(250,200,200,0.1);
+}
+.slide-list{
+    width: max-content;
+    height: fit-content;
+    transition-property: transform;
+    transition-timing-function: linear ease-in-out;
+    transition-duration: 500ms;
+    transition-delay: 10ms;
+}
+
+
+

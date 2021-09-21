@@ -9,8 +9,8 @@ export class Loading extends React.Component{
        
         
             return(
-                <div style={{left: this.props.position.x,top:this.props.position.y}} className="loading-container position-absolute">
-                    <div className="m-auto spinner-border spinner-wrap text-light" role="status">
+                <div  className="loading-container position-fixed">
+                    <div className="m-auto position-relative spinner-border spinner-wrap text-light" role="status">
                         <span className="sr-only" >Loading...</span>
                     </div>
                 </div>

@@ -3,7 +3,13 @@
     width: 100%;
     display: flex;
     flex-flow: column;
+    z-index: 1000;
     justify-content: center;
+    overflow: hidden;
+    scroll-behavior: none;
+    top: 0;
+    left: 0;
+     
 }
 
 .spinner-wrap{

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-
+import './messagebox.css';
 export class MessageBox extends Component{
     constructor(props){
         super(props);
@@ -7,8 +7,10 @@ export class MessageBox extends Component{
 
     render(){
         return(
-           <div className={`alert alert-${this.props.type}`} role="alert" style={{position: "absolute", top: this.props.position.y, left: this.props.position.x}}>
+           <div className="message-wrap">
+               <div className={`alert alert-${this.props.type} message`} role="alert" >
                {this.props.text}
+           </div>
            </div>
         )
     }

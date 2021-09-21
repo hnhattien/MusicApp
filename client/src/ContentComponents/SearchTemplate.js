@@ -36,7 +36,7 @@ export class SearchTemplate extends Component {
                 return res.json()
             }).then(data=>{
                 if(typeof data === typeof {}){
-                   this.props.setPlaylist(data['musics']);
+                   this.props.setPlaylist([...data['musics'],...data['usermusics']]);
                     if(!this.isEmptyResponse(data)){
                         this.setState({data: data, searchValue: ev.target.value},()=>{
                             this.props.toggleLoading(false);

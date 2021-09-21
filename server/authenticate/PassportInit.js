@@ -10,8 +10,8 @@ const initPassport = (passport)=>{
         passwordField: 'password'
       },
         function(username, password, done){
-            console.log("new local");
-          console.log(username,password);
+           
+    
             db.query(`SELECT * FROM user WHERE username = ?`,[username]).then(result=>{
                 if(result.length === 0){
                     return done(null,false,{message: "Incorrect username."});
@@ -40,9 +40,9 @@ const initPassport = (passport)=>{
       })
       
       passport.deserializeUser((id, done)=>{
-        console.log("deserialize")
-        db.query(`SELECT id,avatar, username, email FROM user WHERE id=?`,[id]).then((result)=>{
-          console.log(result);
+        
+        db.query(`SELECT id,avatar,displayedName, username, email FROM user WHERE id=?`,[id]).then((result)=>{
+          
             if(result.length !== 0){
               done(null, result[0]);
             }
