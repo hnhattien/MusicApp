@@ -97,6 +97,10 @@ export class UploadTemplate extends Component {
             songfilename = `${new Date().getMilliseconds()}.${Math.random()*(1000000-100+1)}.${this.state.songfile}`,
             songFileBase64 = null,
             songThumbnailFileBase64 = null;
+
+
+        thumbnailfilename = thumbnailfilename.split(" ").join("");
+        songfilename = songfilename.split(" ").join("");   
         let songFileReader = new FileReader();
         let thumbnailFileReader = new FileReader();
 
