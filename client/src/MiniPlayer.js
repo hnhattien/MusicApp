@@ -4,11 +4,15 @@ export class MiniPlayer extends Component {
     constructor(props){
         super(props);
     }
+    componentDidUpdate = () => {
+        this.render();
+    }
     render() {
+        let currentMusic = this.props.getCurrentMusic();
         return (
-            <div className="position-absolute bg-light rounded mini-player bottom-0 d-flex flex-column">
+            currentMusic && <div className="position-fixed bg-light rounded mini-player bottom-0 d-flex flex-column">
                     <div className="song-info">
-                        <h4 className="text-dark">{this.props.currentMusic && this.props.currentMusic.title}</h4>
+                        <h4 className="text-dark">{currentMusic && currentMusic.title}</h4>
                     </div>
                     <div className="control-btn d-flex justify-content-between">
                         <div className="mini-music-controller">

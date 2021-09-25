@@ -2,3 +2,20 @@
     max-width: 300px;
     max-height: 300px;
 }
+
+.artist-img-thumbnail{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.lyrics{
+    white-space: pre-line;
+    background-color: rgb(33, 42, 53) !important;
+}
+
+.lyrics-header{
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    background: #212A35;
+    margin-bottom: 10px;
+}

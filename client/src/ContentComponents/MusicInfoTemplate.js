@@ -4,26 +4,23 @@ import './musicinfo.css';
 export class MusicInfoTemplate extends Component {
     constructor(props){
         super(props);
+        this.lyricsInputRef = React.createRef();
         this.state = {
-            data: null,
+            music: null,
             error: null,
-            getDataInterval : null
+            getDataInterval : null,
+            lyrics : "",
+            oldLyrics: "",
+            isEditLyrics: false
         }
     }
-    // isEmptyResponse = (data)=>{
-    //     if(typeof data === typeof {}){
-            
-    //         if(Object.keys(data).filter(key=>data[key].length !== 0).length !== 0){ // if have one or more not empty
-    //             return false;
-    //         }
-    //         return true;
-    //     }
-    // }  
+ 
+    
     initialGetDataInterval = () => {
         return setTimeout(()=>{
             console.log("Hi") ;
             this.getInfoMusic();
-            if(this.state.data !== null){
+            if(this.state.music !== null){
                 clearInterval(this.state.getDataInterval)
             }
         },100);
@@ -50,7 +47,7 @@ export class MusicInfoTemplate extends Component {
            } 
            else{
                //Response is object
-             this.setState({data: dataRes});    
+             this.setState({music: dataRes});    
            }
         }).catch(err=>{
            this.setState({error: err});            
@@ -58,30 +55,118 @@ export class MusicInfoTemplate extends Component {
             this.props.toggleLoading(false);
         })
     }
+    showEditLyrics = (ev) => {
+
+       if(!this.state.isEditLyrics){
+           
+           
+            this.setState({
+                isEditLyrics: true,
+                oldLyrics: this.lyricsInputRef.current.textContent           
+            },()=>{
+                if(this.lyricsInputRef){
+                    this.lyricsInputRef.current.focus();
+                    let range = new Range();
+                    
+                    let selection = window.getSelection();
+                    range.setStart(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
+                    range.setEnd(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
+                    selection.removeAllRanges();
+                    selection.addRange(range)
+                    this.lyricsInputRef.current.classList.add("form-control");
+                    
+                }
+            })
+       }
+       else{
+           //Save Lyrics
+         if(this.lyricsInputRef){
+            
+            this.props.toggleLoading(true);
+            fetch('/song/updatelyrics',{
+                method: "POST",
+                headers:{
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    lyrics: this.lyricsInputRef.current.textContent,
+                    songId: this.state.music.id
+                })
+            }).then(res=>{
+                return res.json();
+            }).then((dataRes)=>{
+               if(dataRes.error){
+                   this.props.showMessage(true, String(dataRes.error.message), "danger");
+               }
+               else{
+                    this.lyricsInputRef.current.classList.remove("form-control");
+                    this.setState({
+                        isEditLyrics: false
+                    })
+                    this.props.showMessage(true,dataRes.message,"success")
+               }
+            }).catch(err=>{
+                console.log(err);
+            }).then(()=>{
+                this.props.toggleLoading(false);
+                setTimeout(()=>{
+                    this.props.showMessage(false);
+                },1000);
+            })
+         }
+           
+       }
+    }
+    copyHandle = (ev) => {
+        if(this.lyricsInputRef){
+            let selection = document.getSelection();
+            let range = new Range();
+            range.selectNode(this.lyricsInputRef.current);
+            selection.selectAllChildren(this.lyricsInputRef.current)
+            document.execCommand("copy");
+            this.props.showMessage(true,"Copied","success");
+            setTimeout(()=>{
+                this.props.showMessage(false);
+            },2000)
+        }
+        
+    } 
+    hideEditLyrics = (ev) => {
+        this.setState({
+            isEditLyrics: false           
+        },()=>{
+            this.lyricsInputRef.current.classList.remove("form-control");
+            this.lyricsInputRef.current.textContent=this.state.oldLyrics;
+        })
+    }
     render(){
         if(this.state.error){
             return <h1>{this.state.error.message}</h1>;
         }
-        else if(this.state.data){
+        else if(this.state.music){
             
-                let music = this.state.data;
+                let music = this.state.music;
                 return <div className="music-info-wrap container-fluid">
                     
                     <div className="row">
                         <div className="col-12 music-top-info d-flex">
-                            <div className="music-thumbnail-wrap me-4">
-                                <img className=' info-music-thumbnail rounded img-fluid' src={`/upload/musics/thumbnails/${music.music_thumbnail}`}></img>
+                            <div className="music-thumbnail-wrap me-4 position-relative">
+                                <img onError={(ev)=>{ev.target.error = null; ev.target.src="/upload/musics/thumbnails/default.png"}} className=' info-music-thumbnail rounded img-fluid' src={`/upload/musics/thumbnails/${music.music_thumbnail}`}></img>
+                                <div className="overlay position-absolute top-0">
+                                <span onClick={(ev)=>{this.props.requestPlayMusicFromSlug(ev.currentTarget.dataset.musicSlug);}} data-music-slug={music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={music.music_slug} className="fas fa-play-circle"></i></span>
+                                </div>
                             </div>
                             <div className="music-info-wrap">
-                                <div className="music-title">
+                                <div className="info-music-title">
                                    <span className="text-muted me-2">Song name: </span>
                                    <NavLink className="text-white fw-bold" to={this.props.musicSlug}>
                                        {music.title}
                                    </NavLink>
                                 </div>
-                                <div className="artist-name">
-                                    {music.artist_id && <div><NavLink to={`/artist/${music.artist_slug}`}><img onError={(ev)=>{ev.target.error = null; ev.target.src=""}} src={`/upload/artist/thumbnails/${music.artist_thumbnail}`}></img><span>{music.artist_name}</span></NavLink></div>}
-                                    {!music.artist_id && <div><img src={`/upload/artist/thumbnails/${music.artist_thumbnail}`}></img><span>{music.artist_name}</span></div>}
+                                <div className="info-artist-name">
+                                    {music.artist_id && <div title={music.artist_name}><NavLink to={`/artist/${music.artist_slug}`}><img className="artist-img-thumbnail" onError={(ev)=>{ev.target.src="/upload/images/defaultartist.jpg"; ev.target.onerror = null; }} src={`/upload/musics/thumbnails/${music.artist_thumbnail}`}></img><span>{music.artist_name}</span></NavLink></div>}
+                                    {!music.artist_id && <div title={music.artist_name}><img className="artist-img-thumbnail" onError={(ev)=>{ev.target.src="/upload/images/defaultartist.jpg"; ev.target.onerror = null; }} src={`/upload/artist/thumbnails/${music.artist_thumbnail}`}></img><span>{music.artist_name}</span></div>}
                                 </div>
                                 <div className="view-count upload-time mt-2">
                                     <span className="me-5">
@@ -94,8 +179,28 @@ export class MusicInfoTemplate extends Component {
                             </div>
                         </div>
                     </div>
-                    <div className="row">
+                    <div className="row mt-5">
+                        <div className="col-12 lyrics-wrap">
+                            <div className="lyrics-header justify-content-between d-flex">
+                                <div className="lyrics-info">
+                                    <h1 className="h4">Lyrics</h1>
+                                    <span>Edited by Kei</span>
+                                </div>
+                                <div className="lyrics-tool my-auto me-5">
+                                    <button onClick={this.copyHandle} className="btn btn-dark mx-2"><i class="far fa-clone"></i><span className="ms-2">Copy</span></button>
+                                    <button onClick={this.showEditLyrics} className="btn btn-dark mx-2"><i class="fas fa-pencil-alt"></i><span className="ms-2">Edit</span></button>
+                                </div>
+                            </div>
 
+                            <div ref={this.lyricsInputRef} className="lyrics text-white" contentEditable={this.state.isEditLyrics ? true: false}>
+                                {music.lyrics && String(music.lyrics).trim().replace(/\'/g," ")}
+                            </div>
+                            <div>
+                            {this.state.isEditLyrics && <button className="btn btn-light m-2" onClick={this.hideEditLyrics}>Cancel</button>}
+                            {(!music.lyrics && <button className="btn btn-light m-2" onClick={this.showEditLyrics}>Add lyrics</button>) || (this.state.isEditLyrics && <button className="btn btn-light m-2" onClick={this.showEditLyrics}>Add lyrics</button>)}
+                            
+                            </div>
+                        </div>
                     </div>
                 </div>
             

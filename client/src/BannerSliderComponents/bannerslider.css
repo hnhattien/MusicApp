@@ -1,0 +1,30 @@
+.banner-list{
+    width: max-content;
+    overflow-x: scroll;
+    animation: banner-slider;
+    animation-duration: 60s;
+    animation-iteration-count: infinite;
+}
+.banner-slider-wrap{
+    
+}
+.banner-list-wrap{
+  overflow: hidden;
+}
+.banner-list img{
+    height: 400px;
+    
+}
+
+.banner-list li.active{
+    margin: auto;
+}
+
+/* @keyframes banner-slider {
+    from{
+       transform: translateX(0px);
+    }
+    to{
+        transform: translateX(-4129px);
+    }
+} */

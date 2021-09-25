@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { MusicTemplate } from '../ContentComponents/MusicTemplate';
+import { MusicSearchTemplate } from './MusicSearchTemplate';
+import ArtistSearchTemplate from './ArtistSearchTemplate';
 export class SearchContent extends Component {
     constructor(props){
         super(props);
@@ -9,9 +10,14 @@ export class SearchContent extends Component {
         
         return(
             <div className="row bg-dark">
-                <MusicTemplate  requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug}  searchValue={this.props.searchValue} musics={[...this.props.data.musics, ...this.props.data.usermusics]}>
+                                
+                
+                <MusicSearchTemplate {...this.props}  searchValue={this.props.searchValue} musics={[...this.props.data.musics]}>
 
-                </MusicTemplate>
+                </MusicSearchTemplate>
+                <ArtistSearchTemplate artists={[...this.props.data.artists]} {...this.props}>
+
+                </ArtistSearchTemplate>
             </div>
         )
     }

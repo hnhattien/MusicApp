@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import logo from './logo.svg';
 import React, { Component } from 'react';
 import {BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
@@ -61,40 +62,62 @@ export class App extends Component {
   // }
   
   setPlaylist = (data)=>{
-    this.setState({playlist: data,newMusics: data},()=>{
+    this.setState({playlist: data},()=>{
       this.toggleLoading(false);
     })
   }
-  fetchNewestMusics = async ()=>{
-    // if(this.state.playlist.length === 0){
-    //   this.toggleLoading(true);
-    // }
-    await fetch("/index" ).then(res=>{
-        return res.json();
-    }).then(data=>{
+  getPlaylist = () => {
+    return this.state.playlist;
+  }
+  // fetchNewestMusics = async ()=>{
+  //   // if(this.state.playlist.length === 0){
+  //   //   this.toggleLoading(true);
+  //   // }
+  //   await fetch("/index" ).then(res=>{
+  //       return res.json();
+  //   }).then(data=>{
 
-      if(data['musics']){
-        if(this.state.currentMusic === null){
-          this.setState({
-            currentMusic: data['musics'][data['musics'].length-1],
-            newMusics: data['musics']
-          },()=>{
-            console.log(this.state.newMusics)
-          })
-        }
+  //     if(data['musics']){
+  //       if(this.state.currentMusic === null){
+  //         this.setState({
+  //           currentMusic: data['musics'][data['musics'].length-1],
+  //           newMusics: data['musics']
+  //         },()=>{
+  //           console.log(this.state.newMusics)
+  //         })
+  //       }
        
-        this.setPlaylist([...data['musics'].reverse()])
+  //       this.setPlaylist([...data['musics'].reverse()])
        
-      }     
+  //     }     
+  //   })
+  // }
+  updateHeartChanges = (changedMusic)=>{
+    let newPlaylist = this.state.playlist.map((music)=>{
+      if(music.id === changedMusic.id){
+        return changedMusic;
+      }
+      else{
+        return music;
+      }
+    })
+      
+    
+    this.setState({
+      playlist: newPlaylist
     })
   }
   setCurrentMusic = (data)=>{
+
     this.setState({currentMusic: data,currentTime: 0},()=>{
       if(this.audioRef.current){
         this.audioRef.current.currentTime = 0;
       }
       this.playMusic();
     });
+  }
+  getCurrentMusic = () => {
+    return this.state.currentMusic;
   }
   requestPlayMusicFromSlug = (slug)=>{
     console.log(slug);
@@ -206,10 +229,17 @@ setDuration = ()=>{
         // if(this.audioRef.current){
         //   this.audioRef.current.currentTime = this.state.currentTime + 10;
         // }
+    else{
+      let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
+      if( currentMusicIndex === this.state.playlist.length - 1){
+        this.setCurrentMusic(this.state.playlist[0]);
+      }
       else{
         let nextMusic = this.state.playlist[this.state.playlist.indexOf(this.state.currentMusic)+1];
         this.setCurrentMusic(nextMusic);   
       }
+      
+    }
     
     
 
@@ -217,21 +247,20 @@ setDuration = ()=>{
   backwardHandle = (ev) =>{
 
       
-        if(this.state.isRandom){
-          this.setRandomSong();
-        }
-      
-      
-      else{
-        let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
-        if( currentMusicIndex === 0){
-          this.setCurrentMusic(this.state.playlist[0]);
-        }
-        else{
-          this.setCurrentMusic(this.state.playlist[currentMusicIndex - 1]);
-        }
-        
+    if(this.state.isRandom){
+      this.setRandomSong();
+    }
+
+    else{
+      let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
+      if( currentMusicIndex === 0){
+        this.setCurrentMusic(this.state.playlist[0]);
       }
+      else{
+        this.setCurrentMusic(this.state.playlist[currentMusicIndex - 1]);
+      }
+        
+    }
   }
   updateViewCount = (music) => {
     console.log(music.id, "Hi")
@@ -253,7 +282,7 @@ setDuration = ()=>{
      })
      console.log("Music");
   }
-  endedHandle = ()=>{
+  endedHandle = (ev)=>{
     console.log("End");
     this.updateViewCount(this.state.currentMusic);
     if(this.state.isLoop === true){
@@ -266,9 +295,10 @@ setDuration = ()=>{
       
     }
     else if(this.state.playlist.length !== 0){
-      console.log(Object.keys(this.state.playlist[0]));
-      console.log(Object.keys(this.state.currentMusic))
-      this.setCurrentMusic(this.state.playlist[this.state.playlist.map(JSON.stringify).indexOf(JSON.stringify(this.state.currentMusic))+1]);
+      // console.log(Object.keys(this.state.playlist[0]));
+      // console.log(Object.keys(this.state.currentMusic))
+      // this.setCurrentMusic(this.state.playlist[this.state.playlist.map(JSON.stringify).indexOf(JSON.stringify(this.state.currentMusic))+1]);
+      this.forwardHandle(ev);
       console.log("Set music")
     } 
     else{
@@ -353,24 +383,27 @@ setDuration = ()=>{
         <div className="row position-relative">
         
       <LeftSideBar updateUserChanges={this.updateUserChanges} user={this.state.user} logoutUser={this.logoutUser} toggleLoading={this.toggleLoading} showMessage={this.showMessage} />
-      <MainContent updateUserChanges={this.updateUserChanges} 
+      <MainContent
+      updateHeartChanges={this.updateHeartChanges}
+      updateUserChanges={this.updateUserChanges} 
+      setCurrentMusic={this.setCurrentMusic}
       user={this.state.user} 
       toggleLoading={this.toggleLoading} 
       showMessage={this.showMessage} 
       setLoginState={this.setLoginState} 
       setLogoutState={this.setLogoutState} 
       setPlaylist={this.setPlaylist} 
-      newMusics={this.state.newMusics}
-      playlist={this.state.playlist} 
-      fetchHomeData={this.fetchNewestMusics} 
+      getPlaylist={this.getPlaylist} 
       requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
 
       <RightSideBar 
+      updateHeartChanges={this.updateHeartChanges}
+      showMessage={this.showMessage}
       peekHanlde={this.peekHandle}
       isPlay={this.state.isPlay} 
       isLoop={this.state.isLoop} 
       isRandom={this.state.isRandom} 
-      currentMusic={this.state.currentMusic}
+      getCurrentMusic={this.getCurrentMusic}
       setPlayState={this.setPlayState}
       setPauseState={this.setPauseState}
       toggleLoop={this.toggleLoop}
@@ -379,8 +412,10 @@ setDuration = ()=>{
       duration={this.state.duration}
       cancelMouseHold={this.cancelMouseHold}
       forwardHandle={this.forwardHandle}
-      
+      getPlaylist={this.getPlaylist}
       backwardHandle={this.backwardHandle}
+      currentMusic={this.state.currentMusic}
+      requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}
       />
 
         </div>

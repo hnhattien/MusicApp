@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import '../playercontrol.css';
+
 export class PlayerControl extends Component {
     constructor(props){
         super(props);

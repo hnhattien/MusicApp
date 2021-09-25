@@ -53,7 +53,7 @@ router.post('/changenickname',(req, res, next)=>{
 })
 router.get("/likedmusics",(req, res, next)=>{
   if(req.user){
-      let sqlSelectLikedMusics = `SELECT m.id, m.title, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug from music m INNER JOIN artist a ON m.artist_id = a.id INNER JOIN liketable l ON l.songid= m.id WHERE l.userid=? ORDER BY l.id DESC`;
+      let sqlSelectLikedMusics = `SELECT m.id,l.id as like_id, m.title, m.artist_name, m.thumbnail as music_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug from music m INNER JOIN artist a ON m.artist_id = a.id INNER JOIN liketable l ON l.songid= m.id UNION SELECT m.id, l.id as like_id, m.title, m.artist_name, m.thumbnail as music_thumbnail, m.audio, m.slug as music_slug, m.artist_id as artist_slug from music m INNER JOIN liketable l ON l.songid= m.id  WHERE m.artist_id IS NULL ORDER BY like_id DESC`;
       db.query(sqlSelectLikedMusics,[req.user.id]).then(result => {
         let newResult = Array.from(result).map(music => {
           music['liked'] = true;

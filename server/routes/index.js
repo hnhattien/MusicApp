@@ -16,7 +16,7 @@ const db = require('../databases/DatabaseConnection');
 router.get('/index', async function (req, res, next) {
   
   if(req.user){
-    let sqlSelectCoreMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug FROM music m INNER JOIN artist a oN m.artist_id = a.id UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, slug as artist_slug FROM music m WHERE m.artist_id IS NULL`;
+    let sqlSelectCoreMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics FROM music m INNER JOIN artist a oN m.artist_id = a.id UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id As artist_thumbnail, m.audio, m.slug as music_slug, artist_id as artist_slug, m.viewcount, m.lyrics FROM music m WHERE m.artist_id IS NULL`;
     // let sqlSelectUserMusic = `SELECT id, upload_time, title, artist_name, audio, thumbnail,slug as music_slug FROM music WHERE artist_id IS NULL ORDER BY upload_time DESC`;
     let sqlSelectLikedUser = `SELECT * FROM liketable WHERE userid=?`;
     let resultLikeUser = await db.query(sqlSelectLikedUser, [String(req.user.id)]);
@@ -61,7 +61,7 @@ router.get('/index', async function (req, res, next) {
   }
   else{
     let response = {}
-    let sqlSelectCoreMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug FROM music m INNER JOIN artist a oN m.artist_id = a.id UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, slug as artist_slug FROM music m WHERE m.artist_id IS NULL`;
+    let sqlSelectCoreMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail ,m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics FROM music m INNER JOIN artist a oN m.artist_id = a.id UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail, m.audio, m.slug as music_slug, slug as artist_slug, m.viewcount, m.lyrics FROM music m WHERE m.artist_id IS NULL`;
     // let sqlSelectUserMusic = `SELECT id, title, artist_name, audio, thumbnail, upload_time,slug as music_slug FROM music WHERE artist_id IS NULL ORDER BY upload_time DESC`;
     db.query(sqlSelectCoreMusic).then((resultCoreMusic)=>{
         response['musics'] = resultCoreMusic;

@@ -5,70 +5,55 @@ const router = express.Router();
 const checkFileExisted = require('../javascript-functions/checkfileexisted');
 router.get("/:target", async (req, res, next)=>{
     let targetSearch = req.params.target;
-    let sqlSelectCoreMusic = `SELECT m.id, m.title, m.artist_name, m.thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug FROM music m INNER JOIN artist a oN m.artist_id = a.id WHERE m.title LIKE '${targetSearch}%' OR m.slug LIKE '${targetSearch}%'`;
-    let sqlSelectUserMusic = `SELECT id, title, artist_name, audio, thumbnail,slug as music_slug FROM music WHERE artist_id IS NULL AND (title LIKE '${targetSearch}%' OR slug LIKE '${targetSearch}%')`;
+    let sqlSelectMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics FROM music m INNER JOIN artist a on m.artist_id = a.id WHERE m.title LIKE '${targetSearch}%' OR m.artist_name LIKE '${targetSearch}%' OR m.slug LIKE '${targetSearch}%' UNION SELECT id, title, artist_id, artist_name,,thumbnail as music_thumbnail, artist_id As artist_thumbnail, audio, slug as music_slug, artist_id as artist_slug, viewcount, lyrics FROM music WHERE artist_id IS NULL AND (title LIKE '${targetSearch}%' OR slug LIKE '${targetSearch}%' OR artist_name LIKE '${targetSearch}%')`;
     let sqlSelectArtist = `SELECT id, title, slug, thumbnail FROM artist WHERE title LIKE '${targetSearch}%' OR slug LIKE '${targetSearch}%'`;
     let sqlSelectAlbum = `SELECT id, title, slug, thumbnail FROM album WHERE title LIKE '${targetSearch}%' OR slug LIKE '${targetSearch}%'`;
     
     let response = {}
-    console.log(req.session);
+    let resultLikeUser = [];
+    if(req.user){
+        let sqlSelectLikedUser = `SELECT * FROM liketable WHERE userid=?`;
+        resultLikeUser = await db.query(sqlSelectLikedUser, [String(req.user.id)]);
+    }
     try{
-        let resultMusics = await db.query(sqlSelectCoreMusic);
-        if(resultMusics.length !== 0){
-            response['musics'] = resultMusics;
-        }
-        else{
-            response['musics'] = [];
-        }
+        
+        db.query(sqlSelectMusic).then(resultMusic=>{
+            let newResultMusic = Array.from(resultMusic);
+            newResultMusic.map((music)=>{
+                if(Array.from(resultLikeUser).filter(likedMusic=>likedMusic.songid === music.id).length !== 0){
+                    music['liked'] = true
+                    return music;
+                }
+                else{
+                    return music;
+                }
+            })
+            response['musics'] = newResultMusic;
+        })
+        .then(()=>{
+            db.query(sqlSelectArtist).then((resultArtist)=>{
+                response['artists'] = resultArtist;
+            })
+            .then(()=>{
+                db.query(sqlSelectAlbum).then((resultAlbum)=>{
+                    response['albums'] = resultAlbum;
+                }).then(()=>{
+                    res.send(response);
+                }).catch(err=>{
+                    res.send({error: {message: String(err)}});
+                })
+            })
+        })
+        .catch(err=>{
+            res.send({error: {message: String(err)}});
+        })
+        
         
     }catch(err){
+        res.send({error: {message: String(err)}})
         console.log(err)
     }
-
-    try{
-        let resultUserMusics = await db.query(sqlSelectUserMusic);
-        if(resultUserMusics.length !== 0){
-            response['usermusics'] = resultUserMusics;
-        }
-        else{
-            response['usermusics'] = [];
-        }
-          
-     }catch(err){
-         console.log(err)
-     }
- 
-    try{
-        let resultArtists = await db.query(sqlSelectArtist);
-        if(resultArtists.length !== 0){
-            response['artists'] = resultArtists;
-        }
-        else{
-            response['artists'] = [];
-        }
-      
-    }
-    catch(err){
-        console.log(err)
-    }
-
-    try{
-        let resultAlbums = await db.query(sqlSelectAlbum);
     
-        if(resultAlbums.length !== 0){
-            response['albums'] = resultAlbums;
-        }
-        else{
-            response['albums'] = [];
-        }
-        
-    }
-    catch(err){
-        console.log(err)
-    }
-
-    res.send(response);
-
 })
 
 module.exports = router;

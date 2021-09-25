@@ -73,31 +73,19 @@ router.post("/updateview",(req, res, next)=>{
     
 })
 router.get("/:slug",async (req,res,next)=>{
-    let targetSong = req.params.slug;
+    let targetSlugSong = req.params.slug;
     
-    let sqlSelectMusic = `SELECT m.id, m.lyrics, m.title, m.upload_time, m.thumbnail as music_thumbnail,m.viewcount,m.artist_id, m.artist_name, m.audio, m.slug as music_slug FROM music m WHERE m.slug=?`;
+    let sqlSelectMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics FROM music m INNER JOIN artist a ON a.id = m.artist_id WHERE m.slug=? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, m.lyrics FROM music m WHERE m.artist_id IS NULL AND m.slug =?`;
     let response = {};
 
-    db.query(sqlSelectMusic, [targetSong]).then(result=>{
-
-        if(result.length > 0){
-            response = result[0];
-            if(result[0]['artist_id']){
-                let sqlSelectArtist = `SELECT * FROM artist WHERE id=?`;
-                db.query(sqlSelectArtist,[result[0]['artist_id']]).then((resultArtist)=>{
-                    response['artist_slug'] = resultArtist[0]['slug'];
-                    response['artist_thumbnail'] = resultArtist[0]['thumbnail']
-                })
-            }
-        }
-        else{
-            response = {error:{message:"No data about this music."}};
-        }
+    db.query(sqlSelectMusic, [targetSlugSong, targetSlugSong]).then(result=>{
+        response = result[0];
     }).catch(err=>{
         response['error'] = {message: String(err)}
+        
     }).then(()=>{
         res.send(response);
-    });
+    })
         
 
    
@@ -112,14 +100,21 @@ router.post("/heartaction",async (req, res, next) => {
         let songid = req.body.songid;
         let userid = String(req.user.id);
         let sqlSelectCheck="SELECT * FROM liketable WHERE userid=? AND songid=?";
+        let sqlSelectAffectedMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics FROM music m INNER JOIN artist a ON a.id = m.artist_id WHERE m.id=? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, m.lyrics FROM music m WHERE m.artist_id IS NULL AND m.id =?`
         db.query(sqlSelectCheck,[userid, songid]).then(result=>{
             if(result.length === 0){
                 //This is heart
                 let sqlInsertLike = `INSERT INTO liketable(userid, songid) VALUES(?, ?)`;
                 // Heart is Like
                 db.query(sqlInsertLike, [req.user.id, req.body.songid]).then(resultHeart=>{
-                    console.log(resultHeart);
-                   res.send({message: "Liked", isLike: true});
+                   db.query(sqlSelectAffectedMusic,[songid,songid]).then((resultMusic)=>{
+                       let affectedMusic = resultMusic[0];
+                       affectedMusic['liked'] = true;
+                       res.send({message: "Liked", isLike: true, music: affectedMusic });
+                   })
+
+
+                   
                 }).catch(err=>{
                     res.send({error: {message: String(err)}});
                 })
@@ -128,7 +123,11 @@ router.post("/heartaction",async (req, res, next) => {
                 //This is unheart
                 let sqlRemoveLike = `DELETE FROM liketable WHERE userid=? AND songid=?`;
                 db.query(sqlRemoveLike,[req.user.id, req.body.songid]).then(resultUnheart=>{
-                   res.send({message: "Unliked", isLike: false});
+                    db.query(sqlSelectAffectedMusic,[songid,songid]).then((resultMusic)=>{
+                        let affectedMusic = resultMusic[0];
+                        res.send({message: "Unliked", isLike: false, music: affectedMusic});     
+                    })
+                   
                 }).catch(err=>{
                     res.send({error: {message: String(err)}});
                 })
@@ -182,6 +181,71 @@ router.post("/upload", async(req, res, next) => {
     }
     else{
         res.send({error: {message: "You must to login to upload.", isRequireLogin: true}});
+    }
+})
+
+router.get("/category/:catslug",(req, res, next)=>{
+
+        console.log(req.params.catslug,"HihIio")
+        if(req.params.catslug !== ""){
+            try{
+                let slug = req.params.catslug;
+                console.log(slug,"JSKLJDLAKLDKAD");
+                let sqlSelect = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics, c.title as category_name FROM music m INNER JOIN category c ON c.id = m.cat_id INNER JOIN artist a ON m.artist_id = a.id WHERE c.slug =? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, m.lyrics, c.title as category_name FROM music m INNER JOIN category c ON c.id = m.cat_id INNER JOIN artist a ON m.artist_id IS NULL  WHERE c.slug=?`
+                db.query(sqlSelect,[slug,slug]).then((result)=>{
+                    res.send(result);
+                }).catch(err=>{
+                    res.send({error: {message: String(err)}});    
+                })
+            }
+            catch(err){
+                
+                res.send({error: {message: String(err)}});
+            }
+        }
+        
+
+    
+})
+
+router.get("/album/:albumslug",(req, res, next)=>{
+
+    console.log(req.params.albumslug,"HihIio")
+    if(req.params.albumslug !== ""){
+        try{
+            let slug = req.params.albumslug;
+            console.log(slug,"JSKLJDLAKLDKAD");
+            let sqlSelect = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics, al.title as album_name FROM music m INNER JOIN album al ON al.cat_id = m.cat_id INNER JOIN artist a ON m.artist_id = a.id WHERE al.slug = ? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, m.lyrics, al.title as album_name FROM music m INNER JOIN album al ON al.cat_id = m.cat_id INNER JOIN artist a ON m.artist_id IS NULL  WHERE al.slug=? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, m.lyrics, al.title as album_name FROM music m INNER JOIN album al ON al.artist_id = m.artist_id INNER JOIN artist a ON m.artist_id = a.id WHERE al.slug = ? UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, m.lyrics, al.title as album_name FROM music m INNER JOIN album al ON al.artist_id = m.artist_id INNER JOIN artist a ON m.artist_id IS NULL  WHERE al.slug=?`
+            db.query(sqlSelect,[slug,slug,slug,slug]).then((result)=>{
+                res.send(result);
+            }).catch(err=>{
+                res.send({error: {message: String(err)}});    
+            })
+        }
+        catch(err){
+            
+            res.send({error: {message: String(err)}});
+        }
+    }
+    
+
+
+})
+
+router.post("/updatelyrics",(req, res, next)=>{
+    let songId = req.body.songId;
+    
+    if(songId){
+        let lyrics = req.body.lyrics;
+       let sqlUpdate = `UPDATE music SET lyrics=? WHERE id=?`;
+       db.query(sqlUpdate,[lyrics,songId]).then(()=>{
+           res.send({message:"Update lyrics success"});
+       }).catch(err=>{
+           res.send({error: {message: String(err)}});
+       })
+    }
+    else{
+        res.send({error:{message: "You must to provide a song id. "}});
     }
 })
 module.exports = router;

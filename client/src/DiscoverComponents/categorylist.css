@@ -1,0 +1,28 @@
+img.category-thumbnail{
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(255,255,255,0.1)
+}
+.category-title-wrap{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+    justify-content: center;
+    text-align: center;
+    position: absolute;
+    top: 0;
+}
+.category-card:hover{
+    transform: scale(1.1,1.1);
+
+}
+
+.category-card{
+    width: 200px;
+    height: 200px;
+    position: relative;
+    transition-property: transform;
+    transition-timing-function: linear ease-in-out;
+    transition-duration: 500ms;
+}

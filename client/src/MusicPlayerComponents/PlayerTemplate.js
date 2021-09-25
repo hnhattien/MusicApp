@@ -1,37 +1,49 @@
 import React, { Component } from 'react';
 
 import { PlayerBottom } from './PlayerBottom';
-
+import './musicplayer.css';
 import { PlayerTop } from './PlayerTop';
 export class PlayerTemplate extends Component {
     constructor(props) {
         super(props);
-
+        this.state = {
+            isShowCurrentPlaylist: false
+        }
     }
-
+    toggleCurrentPlaylist = (ev) => {
+        if(this.state.isShowCurrentPlaylist){
+            this.setState({
+                isShowCurrentPlaylist: false
+            })
+        }
+        else{
+            this.setState({
+                isShowCurrentPlaylist: true
+            })
+        }
+    }
     render() {
-        let playersDisplayClasses = this.props.isShowedPlayer ? 'd-flex' : 'd-none';
+        let currentMusic = this.props.getCurrentMusic();
         return (
-            this.props.currentMusic && <React.Fragment>
-                
-                    <div  style={{ backgroundImage: `url("/upload/musics/thumbnails/${this.props.currentMusic.thumbnail}")` }} className="player-background">
+            currentMusic ? <React.Fragment>                
+                    <div  style={{ backgroundImage: `url("/upload/musics/thumbnails/${currentMusic.music_thumbnail}")` }} className="player-background">
                     </div>
-                    <div className={`player ${playersDisplayClasses} flex-column justify-content-between h-100`}>
-                        <PlayerTop isPlay={this.props.isPlay} currentMusic={this.props.currentMusic}>
+                    <div className={`player d-flex position-absolute w-100 flex-column justify-content-between h-100`}>
+                        <PlayerTop toggleCurrentPlaylist={this.toggleCurrentPlaylist} {...this.props} playlist={this.props.getPlaylist()} isShowCurrentPlaylist={this.state.isShowCurrentPlaylist} isPlay={this.props.isPlay} currentMusic={currentMusic}>
 
                         </PlayerTop>
 
-                        <PlayerBottom {...this.props}>
+                        <PlayerBottom {...this.props} toggleCurrentPlaylist={this.toggleCurrentPlaylist} {...this.props}>
 
                         </PlayerBottom>
-                        {/* {console.log("Music1",this.props.currentMusic,"Ref",this.audioRef,this.props.isPlay)} */}
+                        {/* {console.log("Music1",currentMusic,"Ref",this.audioRef,this.props.isPlay)} */}
 
 
 
 
                     </div>
                 
-            </React.Fragment>
+            </React.Fragment> : ""
         )
 
     }

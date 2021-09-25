@@ -1,0 +1,16 @@
+.discover-dropdown-link-wrap{
+    transition-property: height;
+    transition-timing-function: linear;
+    transition-duration: 200ms;
+}
+
+.discover-link{
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+
+}
+
+.discover-link:hover{
+    background-color: rgba(10,10,10,0.2);
+}

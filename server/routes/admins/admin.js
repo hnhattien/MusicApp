@@ -8,59 +8,62 @@ const db = require("../../databases/DatabaseConnection");
 const {connectDB} = require("../../databases/DatabaseConnection");
 const crypto = require('crypto');
 const slug = require('slug');
-const capitalize = require('../../javascript-functions/capitalize.js')
-// router.get("/database/createmusictable",(req, res)=>{
-//   let sql = "CREATE TABLE music(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, audio text, artist_name text DEFAULT 'Unknown', cat_id int, cat_name text, public_year int DEFAULT '2021', lyrics text, artist_id int, upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(artist_id) REFERENCES artist(id), FOREIGN KEY(cat_id) REFERENCES category(id))";
-//   db.query(sql,(err, result) =>{
-//       if(err) throw err;
-//       console.log(result);
-//       res.send("Music table was created");
-//   })
+const capitalize = require('../../javascript-functions/capitalize.js');
 
-// })
+router.get("/database/createmusictable",(req, res)=>{
+  let sql = "CREATE TABLE music(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, audio text,thumbnail TEXT DEFAULT 'default.jpg',slug TEXT, artist_name text DEFAULT 'Unknown', cat_id int, public_year int DEFAULT year(curdate()), lyrics text, artist_id int, upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, viewcount int DEFAULT 0, FOREIGN KEY(artist_id) REFERENCES artist(id), FOREIGN KEY(cat_id) REFERENCES category(id))";
+  db.query(sql).then(()=>{
+    res.send("Music table was created");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
 
-// router.get("/database/createcategorytable",(req,res)=>{
-//   let sql = "CREATE TABLE category(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text)";
-//   db.query(sql,(err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-//     res.send("Category table created...");
-//   })
-// })
+})
 
-// router.get("/database/createartisttable",(req,res)=>{
-//   let sql = "CREATE TABLE artist(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text)"
-//   db.query(sql,(err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-//     res.send("Artist table created...");
-//   })
-// })
-// router.get("/database/createusertable",(req,res)=>{
-//   let sql = "CREATE TABLE user(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, username TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL, displayedName VARCHAR(100), avatar TEXT DEFAULT 'defaultavatar.png')"
-//   db.query(sql,(err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-//     res.send("User table created...");
-//   })
-// })
+router.get("/database/createcategorytable",(req,res)=>{
+  let sql = "CREATE TABLE category(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, slug TEXT)";
+  db.query(sql).then(()=>{
+    res.send("Category table created...");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
 
-// router.get("/database/createresetpasswordtable", (req, res) => {
-//   let sql = "CREATE TABLE resetpassword(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, selector TEXT, token TEXT, useremail TEXT)";
-//   db.query(sql,(err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-//     res.send("resetpassword table created...");
-//   })
-// })
-// router.get('/database/createalbumtable',(req,res)=>{
-//   let sql = "CREATE TABLE album(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title TEXT DEFAULT 'Album is not named', artist_id int, cat_id int, FOREIGN KEY(cat_id) REFERENCES music(cat_id),FOREIGN KEY(artist_id) REFERENCES music(artist_id))";
-//   db.query(sql,(err, result)=>{
-//     if(err) throw err;
-//     console.log(result);
-//     res.send("album table was created done!");
-//   })
-// })
+})
+
+router.get("/database/createartisttable",(req,res)=>{
+  let sql = "CREATE TABLE artist(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, thumbnail TEXT)";
+  db.query(sql).then(()=>{
+    res.send("Artist table created...");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
+
+})
+router.get("/database/createusertable",(req,res)=>{
+  let sql = "CREATE TABLE user(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, username TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL, displayedName VARCHAR(100), avatar TEXT DEFAULT 'defaultavatar.png')"
+  db.query(sql).then(()=>{
+    res.send("User table created...");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
+})
+
+router.get("/database/createresetpasswordtable", (req, res) => {
+  let sql = "CREATE TABLE resetpassword(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, selector TEXT, token TEXT, useremail TEXT)";
+  db.query(sql).then(()=>{
+    res.send("Resetpassword table created...");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
+})
+router.get('/database/createalbumtable',(req,res)=>{
+  let sql = "CREATE TABLE album(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title TEXT DEFAULT 'Album is not named', artist_id int, cat_id int ,thumbnail TEXT, FOREIGN KEY(cat_id) REFERENCES music(cat_id),FOREIGN KEY(artist_id) REFERENCES music(artist_id))";
+  db.query(sql).then(()=>{
+    res.send("Album table created...");
+  }).catch(error=>{
+    res.send({error: {message: String(error)}});
+  })
+})
 router.get('/database/insertmusicfromapiintodatabase', async (req, res)=>{
   musics = musicdata.music
   musics.forEach(async (music) => {
@@ -85,7 +88,7 @@ router.get('/database/insertmusicfromapiintodatabase', async (req, res)=>{
     }  
   
     
-    insertSql = `INSERT music(title,cat_name,artist_name,lyrics,audio, thumbnail, slug) VALUES("${music.title}","${music.cat_name}","${music.artist_name}","${mysql.escape(music.lyrics)}", "${music.mp3}", "${music.thumbnail}", "${slugData}")`
+    insertSql = `INSERT music(title,artist_name,lyrics,audio, thumbnail, slug) VALUES("${music.title}","${music.artist_name}","${mysql.escape(music.lyrics)}", "${music.mp3}", "${music.thumbnail}", "${slugData}")`
     try{
       let result = await db.query(insertSql);
       res.send(result);
@@ -142,9 +145,10 @@ router.get('/database/mapartistfrommusictoartistable',async (req, res)=>{
     let isDuplicated = true;
     let slugData = "";
     let sqlSelectSlug;
-
+    let hexString = '';
     while(isDuplicated){
-      slugData = `${slug(artistname,'-')}`;
+      hexString = crypto.randomBytes(6).toString("hex");
+      slugData = `${slug(artistname,'-')}-${hexString}`;
       sqlSelectSlug = `SELECT slug FROM artist WHERE slug='${slugData}'`;
       try{
         let result = await db.query(sqlSelectSlug);
@@ -184,29 +188,29 @@ router.get('/database/mapartistfrommusictoartistable',async (req, res)=>{
     // })
   })
   
-// router.get('/database/mapartistidtomusictable',async (req,res,next)=>{
-//     let sqlArtist = `SELECT * FROM artist`;
-//     let sqlInsertToMusic;
-//     try{
-//       let resultArtist = await db.query(sqlArtist);
-//       Array.from(resultArtist).forEach( async (artist)=>{
-//         sqlInsertToMusic = `UPDATE music SET artist_id = ${artist.id} WHERE artist_name = '${artist.title}'`;
+router.get('/database/mapartistidtomusictable',async (req,res,next)=>{
+    let sqlArtist = `SELECT * FROM artist`;
+    let sqlInsertToMusic;
+    try{
+      let resultArtist = await db.query(sqlArtist);
+      Array.from(resultArtist).forEach( async (artist)=>{
+        sqlInsertToMusic = `UPDATE music SET artist_id = ${artist.id} WHERE artist_name = '${artist.title}'`;
 
-//         try{
-//           let result = await db.query(sqlInsertToMusic);
-//           console.log(result);
-//         }
-//         catch(err){
-//           console.log(err);
-//         }
-//       })
-//     }
-//     catch(err){
-//       console.log(err);
-//     }
+        try{
+          let result = await db.query(sqlInsertToMusic);
+          console.log(result);
+        }
+        catch(err){
+          console.log(err);
+        }
+      })
+    }
+    catch(err){
+      console.log(err);
+    }
 
-//     res.send("Ok");
-// })
+    res.send("Ok");
+})
 
 // router.get('/database/mapcatidtomusictable',async (req,res,next)=>{
 //   let sqlCategory = `SELECT * FROM category`;
@@ -231,4 +235,57 @@ router.get('/database/mapartistfrommusictoartistable',async (req, res)=>{
 
 //   res.send("Ok");
 // })
+
+router.get('/generateartistalbum',(req, res, next)=>{
+  let sqlArtist = `SELECT id, title FROM artist`;
+  let response = [];
+  db.query(sqlArtist).then((resultArtist)=>{
+    Array.from(resultArtist).forEach((artist)=>{
+      db.query('SELECT * FROM album WHERE artist_id=?',[artist['id']]).then((result=>{
+        if(result.length === 0){
+          let title = `Tuyển tập những bài hát hay nhất của ${artist['title']}`;
+          albumSlug = `${slug(title,"-")}-${new Date().getMilliseconds()}`;
+          response.push(`${title} = ${slug}`);
+          db.query(`INSERT album(title,artist_id,slug) VALUES(?,?,?)`,[title,artist['id'], albumSlug]).then(()=>{
+            
+          }).catch(err=>{
+            res.send(err);
+          })
+        }
+      })).catch(err=>{
+        res.send(err);
+      }).then(()=>{
+        res.send(response.join("\n"))
+      })
+    })
+  }).catch((err)=>{
+    res.send(err);
+  }).then(()=>{
+    res.send(response.join("\n"));
+  })
+})
+
+router.get('/generatecategoryalbum',(req, res, next)=>{
+  let sqlCategory = `SELECT id, title FROM category`;
+  let response = [];
+  db.query(sqlCategory).then((resultCategory)=>{
+    Array.from(resultCategory).forEach((cat)=>{
+      db.query('SELECT * FROM album WHERE cat_id=?',[cat['id']]).then((result=>{
+        if(result.length === 0){
+          console.log(cat.id);
+          let title = `Tuyển tập ${cat['title']}`;
+          albumSlug = `${slug(title,"-")}-${new Date().getMilliseconds().toString()}-${crypto.randomBytes(6).toString("hex")}`;
+          response.push(`${title} = ${albumSlug}`);
+          db.query(`INSERT album(title,cat_id,slug) VALUES(?,?,?)`,[title,cat['id'], albumSlug]).then(()=>{
+            console.log(title);
+          })
+        }
+      }))
+    })
+  }).catch((err)=>{
+    res.send(err);
+  }).then(()=>{
+    res.send(response.join("\n"));
+  })
+})
 module.exports = router;

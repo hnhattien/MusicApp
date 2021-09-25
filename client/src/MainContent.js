@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
 import {HomeTemplate} from './ContentComponents/HomeTemplate';
 import {RankTemplate} from './ContentComponents/RankTemplate';
-import { DiscoverTemplate } from './ContentComponents/DiscoverTemplate';
-import { SearchTemplate } from './ContentComponents/SearchTemplate';
+import { DiscoverTemplate } from './DiscoverComponents/DiscoverTemplate';
+import { SearchTemplate } from './SearchUIComponents/SearchTemplate';
 import {NotFound404} from './NotFound404';
 import {SearchContent} from './SearchUIComponents/SearchContent'
 import { MusicInfoTemplate } from './ContentComponents/MusicInfoTemplate';
@@ -16,6 +16,8 @@ import PrivateRoute from './PrivateRoute';
 import ProfileSetting from './Profile/ProfileSetting';
 import UploadTemplate from './ContentComponents/UploadTemplate';
 import NewestMusicComponent from './NewestMusicComponent';
+import CategoryTemplate from './ContentComponents/CategoryTemplate';
+import AlbumTemplate from './ContentComponents/AlbumTemplate';
 export class MainContent extends Component {
     constructor(props){
         super(props);
@@ -55,26 +57,26 @@ export class MainContent extends Component {
             <div className="col bg-dark p-0 position-relative">
                 <Switch>
                     <Route path='/' exact={true} render={(routeProps)=><HomeTemplate {...this.props} ></HomeTemplate>
-                    }>
+                    }/>
                         
-                    </Route>
-                    <Route path="/search" exact={true} 
-                    render={(routeProps)=>{
-                        return <><SearchTemplate {...this.props}/>
-                        </>
-                    }
-                    }>
-
-                    </Route>
-                    <Route path="/rank" exact={true} render={(routeProps)=><RankTemplate {...this.props}></RankTemplate>}>
-
-                    </Route>
-                    <Route path="/discover" exact={true} render={(routeProps)=><DiscoverTemplate {...this.props}></DiscoverTemplate>}></Route>
+                    
+                    <Route path="/search" exact={true} render={(routeProps)=>{return <><SearchTemplate {...this.props}/></>}}/>
+                    <Route path="/rank" exact={true} render={(routeProps)=><RankTemplate {...this.props}></RankTemplate>}/>
+                    
+                    <Route path={"/category/:slug"} exact={true} render={(routeProps)=>{
+                        return <CategoryTemplate categorySlug={routeProps.match.url} {...this.props} />
+                    }}/>
+                    <Route path={"/album/:slug"} exact={true} render={(routeProps)=>{
+                        return <AlbumTemplate albumSlug={routeProps.match.url} {...this.props} />
+                    }}/>
+                    <Route path="/discover/category" exact={true} render={(routeProps)=><DiscoverTemplate isCategory={true} {...this.props}></DiscoverTemplate>}></Route>
+                    <Route path="/discover/album" exact={true} render={(routeProps)=><DiscoverTemplate isAlbum={true} {...this.props}></DiscoverTemplate>}></Route>
                     <Route path="/song/:song" exact={true} render={(routeProps)=>{
                        
                     return <MusicInfoTemplate {...this.props} musicSlug={routeProps.match.url}></MusicInfoTemplate>
-                    }} ></Route>
+                    }} />
 
+                    
                     <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...this.props}></LoginTemplate>}></Route>
                     <Route path="/signup" render={(routeProps) => <SignupTemplate {...this.props}/>} exact={true}></Route>
                     <PrivateRoute componentProps={this.props} component={ProfileSetting} path={'/profile/setting'} auth={localStorage.getItem("userid") !== null} ></PrivateRoute>

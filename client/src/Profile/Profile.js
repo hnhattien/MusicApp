@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import './profile.css';
-import {BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
+import {withRouter, BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
 import SettingButton from '../LeftSideBarComponents/SettingButton';
 import { MusicCardItem } from '../ContentComponents/MusicCardItem';
 import MusicCardList from '../ContentComponents/MusicCardList';
@@ -12,9 +12,8 @@ export class Profile extends Component {
             likedMusics : []
         }
     }
-   
     componentDidMount = () => {
-        
+             
         fetch('/users/likedmusics', {
             method: "GET",
             headers: {
@@ -25,13 +24,20 @@ export class Profile extends Component {
             return res.json();
         }).then(musics => {
             console.log(musics);
-            let musicSet = new Set(musics.map(JSON.stringify));
-            let filteredData = Array.from(musicSet).map(JSON.parse); //Filter duplicated
-            this.setState({
-                likedMusics : filteredData
-            }, () => {
-                console.log(filteredData);
-            })
+            if(Array.isArray(musics)){
+                let musicSet = new Set(musics.map(JSON.stringify));
+                let filteredData = Array.from(musicSet).map(JSON.parse); //Filter duplicated
+                this.setState({
+                    likedMusics : filteredData
+                }, () => {
+                    this.props.setPlaylist(this.state.likedMusics);
+                })
+            }
+            else{
+                this.props.showMessage(true,musics.error.message,"danger");
+                this.props.history.push('/login');
+            }
+            
         }).catch(err => {
             this.props.showMessage(true,String(err),"danger");
         }).then(()=>{
@@ -80,4 +86,4 @@ export class Profile extends Component {
     }
 }
 
-export default Profile
+export default withRouter(Profile);

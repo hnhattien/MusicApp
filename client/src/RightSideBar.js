@@ -8,6 +8,7 @@ export class RightSideBar extends Component{
         this.detectClickOutside = React.createRef();
         this.state = {
             isShowedPlayer : false,
+           
         }    
     }
     showPlayer = (ev) => {
@@ -34,16 +35,16 @@ export class RightSideBar extends Component{
             }
         }
     }
+    
     render(){
-        let background = this.props.currentMusic && "url(/upload/musics/thumbnails/${this.props.currentMusic.thumbnail})"
-        let playerDisplayStyle = !this.state.isShowedPlayer ? "-300px" : "0";
+        // let currentMusic = this.props.getCurrentMusic();
+        // let background = currentMusic && "url(/upload/musics/thumbnails/${currentMusic.thumbnail})"
+        let playerDisplayStyle = !this.state.isShowedPlayer ? "-320px" : "0";
         return(
             <>
             <MiniPlayer showPlayer={this.showPlayer}  {...this.props} ></MiniPlayer>
-            <div style={{right: `${playerDisplayStyle}`}} className="p-0 top-0 position-fixed right-side-bar-wrap">
-                
-                <div className="" ref={this.detectClickOutside}>{this.state.isShowedPlayer && <div><PlayerTemplate isShowedPlayer={this.state.isShowedPlayer} {...this.props}></PlayerTemplate></div>}</div>
-                
+            <div ref={this.detectClickOutside} style={{right: `${playerDisplayStyle}`}} className="p-0 top-0 position-fixed music-player-wrap right-side-bar-wrap">
+               <PlayerTemplate {...this.props}></PlayerTemplate>
             </div>
             </>
         )

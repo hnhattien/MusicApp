@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { withRouter } from 'react-router-dom';
 import './upload.css';
 export class UploadTemplate extends Component {
     constructor(props){
@@ -11,7 +12,7 @@ export class UploadTemplate extends Component {
             category: 1,
             thumbnailfile: "",
             songfile: "",
-            thumbnailBlob: "/upload/musics/thumbnails/cauhencauthe.jpg"
+            thumbnailBlob: ''
         }
     }
 
@@ -37,8 +38,10 @@ export class UploadTemplate extends Component {
         }
         else if(nameAttr === "songfile"){
             let filename = String(ev.target.value).split(/(\\|\/|\\\\)/g).pop();
-            this.setState({
-                [nameAttr] : filename
+            this.setState({ 
+                [nameAttr] : filename,
+                songname: filename.split(/(\.)[a-zA-Z]+/).shift().split("-").shift(),
+                artistname: filename.split(/(\.)[a-zA-Z]+/).shift().split("-").pop().split(/\[.*\]/).shift()
             })
         }
         else{
@@ -77,6 +80,7 @@ export class UploadTemplate extends Component {
                 }
                 else{
                     this.props.showMessage(true,dataRes.message,"success");
+                    this.props.history.push("/");
                 }
             }).catch(err => {
                 this.props.showMessage(true,String(err),"danger");
@@ -100,7 +104,7 @@ export class UploadTemplate extends Component {
 
 
         thumbnailfilename = thumbnailfilename.split(" ").join("");
-        songfilename = songfilename.split(" ").join("");   
+        songfilename = songfilename.split(" ").join("").replace("|","");   
         let songFileReader = new FileReader();
         let thumbnailFileReader = new FileReader();
 
@@ -129,13 +133,13 @@ export class UploadTemplate extends Component {
                 <div className="row">
                     <div className="col-12 mt-5">
                         <label htmlFor="songname">Song name</label>
-                        <input onInput={this.handleChange} id="songname" placeholder="Song name" name="songname" className="form-control mt-2" type="text">
+                        <input onInput={this.handleChange} value={this.state.songname} id="songname" placeholder="Song name" name="songname" className="form-control mt-2" type="text">
                         </input>
                     </div>
                     <div className="col-12 mt-5">
 
                         <label htmlFor="artistname">Artist name</label>
-                        <input onInput={this.handleChange} id="artistname" placeholder="Artist name" name="artistname" className="form-control mt-2" type="text">
+                        <input onInput={this.handleChange} id="artistname" placeholder="Artist name" value={this.state.artistname} name="artistname" className="form-control mt-2" type="text">
                         </input>
                     </div>
                     <div className="col-12 mt-5">
@@ -154,7 +158,7 @@ export class UploadTemplate extends Component {
                         <div className="thumbnail-upload-wrap">
                             
                             <div className="thumbnail-upload file-upload-box">
-                                <img onError={(ev)=>{ev.target.onerror=null; ev.target.src="/upload/musics/thumbnails/default.png"}} className="w-100 h-100 rounded" src={this.state.thumbnailBlob}/>
+                                <img onError={(ev)=>{ev.target.onerror=null; ev.target.src="/upload/musics/thumbnails/default.png"}} className="w-100 h-100 rounded" src={this.state.thumbnailBlob || '/upload/musics/thumbnails/cauhencauthe.jpg'}/>
                                 <div className="file-upload-label-wrap" onClick={this.handleUploadSongThumbnail}>
                                     <span className="icon" role="button"><i class="fas fa-upload"></i></span>
                                     <span className="filename">{this.state.thumbnailfile}</span>
@@ -187,4 +191,4 @@ export class UploadTemplate extends Component {
     }
 }
 
-export default UploadTemplate
+export default withRouter(UploadTemplate);

@@ -1,0 +1,30 @@
+.music-list-item:hover{
+    background-color: rgba(10,10,10,0.3) !important;
+}
+.music-list-item *{
+    font-size: 1rem !important;
+    
+}
+.music-list-item{
+    height: 69px;
+}
+.music-title{
+    font-size: 1rem;
+    width: 190px;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    text-overflow: ellipsis;
+        
+    
+}
+
+.artist-name{
+    font-size: 0.8rem !important;
+    width: 170px;
+    overflow: hidden;
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    text-overflow: ellipsis;
+
+}

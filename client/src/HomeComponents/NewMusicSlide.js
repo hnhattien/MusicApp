@@ -140,7 +140,7 @@ export class NewMusicsTemplate extends Component {
                    
                            <div ref={this.slideListWrap} className="slide-list-wrap">
                            <NavLink to={`/newest`} exact={true}>
-                                New Songs {'>'}
+                                <h4>News</h4>
                             </NavLink>
                                 <ul ref={this.slideList} style={{transform: `translate3d(-${this.state.translate.x}px,0px,0px)`}} className={`list-inline position-relative slide-list`}>
                                     <MusicCardList isInlineList={true} {...this.props} musicArray={this.props.newMusics}>
