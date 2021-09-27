@@ -48,19 +48,25 @@ export class NicknameCustomizePopup extends Component {
     }
     render() {
         return (
-            <div className={'popup-wrapper bg-light w-100'}>
-                <div className="text-dark customize-avatar-popup-title">
-                    <h1 className="text-dark">Change Nickname</h1>
+            <div className={'popup-wrapper bg-dark w-75 border text-white'}>
+                <div className="text-white customize-avatar-popup-title">
+                    <h1 className="text-white">Change Nickname</h1>
                 </div>
-                <div className="popup-inner bg-light mt-5">
+                <div className="popup-inner bg-dark mt-5">
+                
                     <div className="nickname-input-wrap d-flex justify-content-center">
-                    <input maxLength="50" value={this.state.nickname} onChange={this.changeHandle} className="form-control w-75" name="nickname">
+                    <h6 className="d-block position-relative me-2" style={{top: "8px"}}>Nickname: </h6>        
+                    <input maxLength="50" value={this.state.nickname} onChange={this.changeHandle} className="form-control w-75 bg-dark text-white" name="nickname">
                     </input>
                     </div>
                     <div className="save-btn-wrap">
-                        <button onClick={this.saveEdit} className="btn btn-primary">
+                        <button className="cancel-btn btn btn-light me-2" onClick={this.props.toggleNicknameEditorPopup} >
+                            Cancel
+                        </button>
+                        <button onClick={this.saveEdit} className="btn btn-light">
                             Change nickname
                         </button>
+                        
                     </div>
                 </div>
             </div>

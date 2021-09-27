@@ -64,7 +64,13 @@ export class ProfileSetting extends Component {
         }
     }
     toggleAvatarCustomizePopup = (isShow) => {
-        this.setState({isShowedAvatarCustomizePopup: isShow});    
+        if(this.state.isShowedAvatarCustomizePopup){
+            this.setState({isShowedAvatarCustomizePopup: false});    
+        }
+        else{
+            this.setState({isShowedAvatarCustomizePopup: true});
+        }
+        
     }
     toggleAvatarCustomizeMenu = (ev) => {
         this.setState({isShowedAvatarCustomizeMenu: !this.state.isShowedAvatarCustomizeMenu});

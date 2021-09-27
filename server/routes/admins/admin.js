@@ -288,4 +288,29 @@ router.get('/generatecategoryalbum',(req, res, next)=>{
     res.send(response.join("\n"));
   })
 })
+
+// router.get('/database/maplyricsfrommusictabletolyricstable',async (req,res,next)=>{
+//   let sqlMusic = `SELECT * FROM music`;
+//   let sqlInsertToLyrics;
+//   try{
+//     let resultMusic = await db.query(sqlMusic);
+//     Array.from(resultMusic).forEach( async (music)=>{
+//       sqlInsertToLyrics = `INSERT lyrics(songid,userid,lyric)VALUES(?,1,?)`;
+      
+//       try{
+//         let result = await db.query(sqlInsertToLyrics,[music.id,music.lyrics]);
+//         console.log(result);
+//       }
+//       catch(err){
+//         console.log(err);
+//       }
+//     })
+//   }
+//   catch(err){
+//     console.log(err);
+//   }
+
+//   res.send("Ok");
+// })
+
 module.exports = router;

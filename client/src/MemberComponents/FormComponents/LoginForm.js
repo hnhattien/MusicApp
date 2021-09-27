@@ -3,6 +3,7 @@ import { InputForm } from './InputForm';
 import { SubmitButton } from './SumbitButton';
 import {LabelForm} from './LabelForm';
 import { FloatingForm } from './FloatingForm';
+import { NavLink } from 'react-router-dom';
 import { ValidFeedbackLabel } from './ValidFeedbackLabel';
 
 import {InvalidFeedbackLabel} from './InvalidFeedbackLabel';
@@ -96,10 +97,14 @@ class LoginForm extends Component{
                     <InputForm handleBlur={this.handleBlur} value={this.state.password} classes="form-control bg-dark text-white" handleChange={this.handleChange} name="password" type={"password"} id="password" placeholder="Type a password to login..."></InputForm>
                     <LabelForm text="Password" for="password" ></LabelForm>
                 </FloatingForm>
-                <div className="input-group mt-5">
+                <div className=" mt-5">
                     <SubmitButton submitHandle={this.props.submitHanlde} text="Login" name="submit" classes={'btn btn-primary'}>
                     </SubmitButton>
+                    <NavLink to={'/forgetpassword'} className="btn text-dark ms-4 btn-danger">
+                        Forget Password
+                    </NavLink>
                 </div>
+                
             </form>
             
         )

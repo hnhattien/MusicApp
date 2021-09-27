@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { NavLink, withRouter } from 'react-router-dom';
-import ActionOnMusicTemplate from './ActionOnMusicTemplate';
+
 export class MusicCardItem extends Component {
     constructor(props){
         super(props);
@@ -25,7 +25,7 @@ export class MusicCardItem extends Component {
                                 
 
                                 <div className="overlay">
-                                    <span onClick={(ev)=>{this.props.requestPlayMusicFromSlug(ev.currentTarget.dataset.musicSlug);}} data-music-slug={this.props.music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={this.props.music.music_slug} className="fas fa-play-circle"></i></span>
+                                    <span onClick={(ev)=>{console.log(this.props.music.music_slug,"Set");this.props.requestPlayMusicFromSlug(this.props.music.music_slug)}} data-music-slug={this.props.music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={this.props.music.music_slug} className="fas fa-play-circle"></i></span>
                                 </div>
                             </div>
                            
@@ -33,7 +33,6 @@ export class MusicCardItem extends Component {
 
 
                     </div>
-                    {!this.props.isInlineList && <ActionOnMusicTemplate isHearted={this.props.music.liked ? true : false} {...this.props}></ActionOnMusicTemplate>}
                     <div className="bottom-info">
                         <h5 className="card-title mt-2 text-white">
                             <NavLink to={`/song/${this.props.music.music_slug}`} exact={true} className="text-white">

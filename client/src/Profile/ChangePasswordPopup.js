@@ -63,31 +63,31 @@ export class ChangePasswordPopup extends Component {
     }
     render() {
         return (
-            <div className={'popup-wrapper bg-light w-100'}>
-                <div className="text-dark customize-avatar-popup-title">
-                    <h1 className="text-dark">Change Password</h1>
+            <div className={'popup-wrapper bg-dark w-75 border'}>
+                <div className="text-white customize-avatar-popup-title">
+                    <h1 className="text-white">Change Password</h1>
                 </div>
-                <div className="popup-inner ms-4 bg-light mt-5 d-flex flex-column justify-content-center ">
+                <div className="popup-inner ms-4 bg-dark mt-5 d-flex flex-column justify-content-center ">
                     <div className="current-password-input-wrap">
-                        <h4 className="text-dark">Current Password</h4>
-                        <input value={this.state.currentpassword} onChange={this.changeHandle} className="form-control w-75" name="currentpassword">
+                        <h4 className="text-white">Current Password</h4>
+                        <input value={this.state.currentpassword} onChange={this.changeHandle} className="form-control bg-dark text-white w-75" name="currentpassword">
                         </input>
                     </div>
                     <div className="new-password-input-wrap">
-                    <h4 className="text-dark">New Password</h4>
-                        <input value={this.state.newpassword} onChange={this.changeHandle} className="form-control w-75" name="newpassword">
+                    <h4 className="text-white">New Password</h4>
+                        <input value={this.state.newpassword} onChange={this.changeHandle} className="form-control bg-dark text-white w-75" name="newpassword">
                         </input>
                     </div>
                     <div className="repeat-password-input-wrap">
-                    <h4 className="text-dark">Repeat Password</h4>
-                        <input value={this.state.repeatnewpassword} onChange={this.changeHandle} className="form-control w-75" name="repeatnewpassword">
+                    <h4 className="text-white">Repeat Password</h4>
+                        <input value={this.state.repeatnewpassword} onChange={this.changeHandle} className="form-control bg-dark text-white w-75" name="repeatnewpassword">
                         </input>
                     </div>
                     <div className="change-password-btn-wrap mt-5">
-                        <button onClick={this.props.toggleChangePasswordPopup} className="btn btn-primary me-4">
+                        <button onClick={this.props.toggleChangePasswordPopup} className="btn btn-light me-4">
                             Cancel
                         </button>
-                        <button onClick={this.changePassword} className="btn btn-primary">
+                        <button onClick={this.changePassword} className="btn btn-light">
                             Change password
                         </button>
                     </div>

@@ -97,8 +97,8 @@ export class UploadTemplate extends Component {
         let songname = this.state.songname,
             artistname = this.state.artistname,
             catid = this.state.category,
-            thumbnailfilename = `${new Date().getMilliseconds()}.${Math.random()*(1000000-100+1)}.${this.state.thumbnailfile}`,
-            songfilename = `${new Date().getMilliseconds()}.${Math.random()*(1000000-100+1)}.${this.state.songfile}`,
+            thumbnailfilename = `${new Date().valueOf()}.${Math.random()*(1000000-100+1)}.${this.state.thumbnailfile}`,
+            songfilename = `${new Date().valueOf()}.${Math.random()*(1000000-100+1)}.${this.state.songfile}`,
             songFileBase64 = null,
             songThumbnailFileBase64 = null;
 

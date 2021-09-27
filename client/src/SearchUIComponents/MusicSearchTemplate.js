@@ -31,7 +31,7 @@ export class MusicSearchTemplate extends Component {
             }
             else{
                 return <div>
-                    <h1>Artist</h1><ul>No data</ul>
+                    <h1>Music</h1><ul>No data</ul>
                 </div>
             }
         // }

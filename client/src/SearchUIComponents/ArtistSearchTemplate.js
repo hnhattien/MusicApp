@@ -19,10 +19,11 @@ export class ArtistSearchTemplate extends Component {
                 </ul>
             </div>
         }
-        else{
-            return <div>
-                <h1>Artist</h1><ul>No data</ul>
-            </div>
+        else
+        {
+           return <div>
+           <h1>Artist</h1><ul>No data</ul>
+       </div>
         }
     }
 }

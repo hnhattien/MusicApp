@@ -55,7 +55,7 @@ export class ActionOnMusicTemplate extends Component {
         }
     }
     render() {
-        let heartbtnClasses = (this.props.music.liked === true) ? "fas" : 'far';
+        let heartbtnClasses = (this.props.isHearted) ? "fas" : 'far';
         return (
             <div className="action-on-music-wrap">
                 {/* <ul className="list-inline"> */}

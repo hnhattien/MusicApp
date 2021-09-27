@@ -10,8 +10,6 @@ export class SearchContent extends Component {
         
         return(
             <div className="row bg-dark">
-                                
-                
                 <MusicSearchTemplate {...this.props}  searchValue={this.props.searchValue} musics={[...this.props.data.musics]}>
 
                 </MusicSearchTemplate>

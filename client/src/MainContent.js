@@ -14,6 +14,8 @@ import {MessageBox} from './MessageComponents/MessageBox';
 import Profile from './Profile/Profile';
 import PrivateRoute from './PrivateRoute';
 import ProfileSetting from './Profile/ProfileSetting';
+import ForgetPasswordTemplate from './MemberComponents/ForgetPasswordTemplate';
+import ResetPasswordTemplate from './MemberComponents/ResetPasswordTemplate';
 import UploadTemplate from './ContentComponents/UploadTemplate';
 import NewestMusicComponent from './NewestMusicComponent';
 import CategoryTemplate from './ContentComponents/CategoryTemplate';
@@ -79,6 +81,8 @@ export class MainContent extends Component {
                     
                     <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...this.props}></LoginTemplate>}></Route>
                     <Route path="/signup" render={(routeProps) => <SignupTemplate {...this.props}/>} exact={true}></Route>
+                    <Route path="/forgetpassword" render={(routeProps) => <ForgetPasswordTemplate {...this.props}/>} exact={true}></Route>
+                    <Route path="/resetpassword" render={(routeProps) => <ResetPasswordTemplate {...this.props}/>} exact={true}></Route>
                     <PrivateRoute componentProps={this.props} component={ProfileSetting} path={'/profile/setting'} auth={localStorage.getItem("userid") !== null} ></PrivateRoute>
                     <PrivateRoute componentProps={this.props} component={Profile} path={'/profile'} auth={localStorage.getItem("userid") !== null}/>
                     <Route path="/upload" exact={true} render={(routerProps) => {

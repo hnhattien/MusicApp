@@ -31,7 +31,7 @@
     filter: blur(20px); */
   }
   .music-player-wrap{
-   
+       z-index: 2000;
        justify-content: center;    
   }
 

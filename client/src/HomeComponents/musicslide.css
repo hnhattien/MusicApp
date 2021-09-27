@@ -37,10 +37,18 @@
    
 }
 .new-music-slider-wrap{
+    top: 30rem;
+}
+.card-slide-wrap{
     position: absolute;
-    top: 200px;
     width: 100%;
     border: 1px solid rgba(250,200,200,0.1);
+}
+.new-album-slider-wrap{
+    top: 55rem;
+}
+.nhac-phim-slider-wrap{
+    top: 80rem;
 }
 .slide-list{
     width: max-content;

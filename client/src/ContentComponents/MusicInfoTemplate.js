@@ -69,10 +69,12 @@ export class MusicInfoTemplate extends Component {
                     let range = new Range();
                     
                     let selection = window.getSelection();
-                    range.setStart(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
-                    range.setEnd(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
-                    selection.removeAllRanges();
-                    selection.addRange(range)
+                    if(this.lyricsInputRef.current.firstChild){
+                        range.setStart(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
+                        range.setEnd(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
+                        selection.removeAllRanges();
+                        selection.addRange(range)
+                    }
                     this.lyricsInputRef.current.classList.add("form-control");
                     
                 }
@@ -96,6 +98,11 @@ export class MusicInfoTemplate extends Component {
             }).then(res=>{
                 return res.json();
             }).then((dataRes)=>{
+                console.log(dataRes,"Hi kei");
+               if(dataRes.isRequiredLogin){
+                this.props.showMessage(true, String(dataRes.error.message), "danger");
+                this.props.history.push("/login");
+               }
                if(dataRes.error){
                    this.props.showMessage(true, String(dataRes.error.message), "danger");
                }
@@ -112,7 +119,7 @@ export class MusicInfoTemplate extends Component {
                 this.props.toggleLoading(false);
                 setTimeout(()=>{
                     this.props.showMessage(false);
-                },1000);
+                },2000);
             })
          }
            
@@ -154,7 +161,7 @@ export class MusicInfoTemplate extends Component {
                             <div className="music-thumbnail-wrap me-4 position-relative">
                                 <img onError={(ev)=>{ev.target.error = null; ev.target.src="/upload/musics/thumbnails/default.png"}} className=' info-music-thumbnail rounded img-fluid' src={`/upload/musics/thumbnails/${music.music_thumbnail}`}></img>
                                 <div className="overlay position-absolute top-0">
-                                <span onClick={(ev)=>{this.props.requestPlayMusicFromSlug(ev.currentTarget.dataset.musicSlug);}} data-music-slug={music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={music.music_slug} className="fas fa-play-circle"></i></span>
+                                <span onClick={(ev)=>{this.props.requestPlayMusicFromSlug(music.music_slug);}} data-music-slug={music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={music.music_slug} className="fas fa-play-circle"></i></span>
                                 </div>
                             </div>
                             <div className="music-info-wrap">
@@ -184,7 +191,7 @@ export class MusicInfoTemplate extends Component {
                             <div className="lyrics-header justify-content-between d-flex">
                                 <div className="lyrics-info">
                                     <h1 className="h4">Lyrics</h1>
-                                    <span>Edited by Kei</span>
+                                    <span>Edited by {music.editLyricBy ? music.editLyricBy : "Unknown" }</span>
                                 </div>
                                 <div className="lyrics-tool my-auto me-5">
                                     <button onClick={this.copyHandle} className="btn btn-dark mx-2"><i class="far fa-clone"></i><span className="ms-2">Copy</span></button>

@@ -97,13 +97,16 @@ export class AvatarCustomizePopup extends Component {
     // rotateRight = () => {
 
     // }
+    toggleAvatarCustomizePopup = () => {
+        this.setState({isShowedAvatarCustomizePopup: isShow});    
+    }
     render() {
         return (
-            <div className={'popup-wrapper bg-light w-100'}>
-                <div className="text-dark customize-avatar-popup-title">
-                    <h1 className="text-dark">Change avatar</h1>
+            <div className={'popup-wrapper bg-dark w-75 border'}>
+                <div className="text-white customize-avatar-popup-title">
+                    <h1 className="text-white">Change avatar</h1>
                 </div>
-                <div className="popup-inner bg-light mt-5">
+                <div className="popup-inner bg-dark mt-5">
                     <div className="setting-avatar-placeholder-wrap m-auto image-box">
                        <img onError={(ev)=>{ev.target.onerror=null; ev.target.src="/upload/images/defaultavatar.png"}} style={{display: "none"}} ref={this.currentEditImage} className={`setting-avatar-placeholder user-avatar-image image w-100 h-100`} src={this.props.targetAvatar}></img>
                        {/* <div className="setting-avatar-crop-scope">
@@ -111,7 +114,10 @@ export class AvatarCustomizePopup extends Component {
                        </div> */}
                     </div>
                     <div className="save-btn-wrap">
-                        <button onClick={this.saveEdit} className="btn btn-primary">
+                        <button onClick={this.props.toggleAvatarCustomizePopup} className="btn btn-light me-2">
+Cancel
+                        </button>
+                        <button onClick={this.saveEdit} className="btn btn-light">
                             Change avatar
                         </button>
                     </div>

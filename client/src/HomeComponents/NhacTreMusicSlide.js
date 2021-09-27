@@ -1,10 +1,8 @@
 import React, { Component } from 'react'
 import { NavLink, withRouter } from 'react-router-dom';
-import MusicCardItem from '../ContentComponents/MusicCardItem';
 import MusicCardList from '../ContentComponents/MusicCardList';
 import SlideControlButton from './SlideControlButton';
-import './musicslide.css';
-export class NewMusicsTemplate extends Component {
+export class NhacTreMusicSlide extends Component {
     constructor(props) {
         super(props);
         this.slideList = React.createRef();
@@ -120,16 +118,15 @@ export class NewMusicsTemplate extends Component {
 
     componentWillMount = async () => {
         try {
-          let res = await fetch('/index');
-          let dataRes = await res.json();
+          let res = await fetch('/song/category/nhac-tre');
+          let musics = await res.json();
           
-          if(dataRes.error){
-            this.props.showMessage(true,dataRes.error.message,"danger");
+          if(musics.error){
+            this.props.showMessage(true,musics.error.message,"danger");
           }
           else{
-            console.log(dataRes)
-            this.setState({data: dataRes['musics']});
-            this.props.setPlaylist([...dataRes['musics'].reverse()]);
+            console.log(musics)
+            this.setState({data: musics});
           }
         }catch(err){
             this.props.showMessage(true,String(err),"danger");
@@ -160,7 +157,7 @@ export class NewMusicsTemplate extends Component {
     render() {
         return (
             <>
-                <div style={{top: this.props.styleTop}} className={`row ${this.props.cardSlideClass}`}>
+                <div style={{top: this.props.styleTop}} className={`row new-music-slider-wrap ${this.props.cardSlideClass}`}>
 
                     <div className="col-12 slide-wrap">
                         <div className="new-songs-link-wrap">
@@ -178,8 +175,8 @@ export class NewMusicsTemplate extends Component {
                        
                    
                            <div ref={this.slideListWrap} className="slide-list-wrap">
-                           <NavLink to={`/newest`} exact={true}>
-                                <h4>{this.props.heading}</h4>
+                           <NavLink to={`/category/nhac-tre`} exact={true}>
+                           <h4>{this.props.heading}</h4>
                             </NavLink>
                                 <ul ref={this.slideList} style={{transform: `translate3d(-${this.state.translate.x}px,0px,0px)`}} className={`list-inline position-relative slide-list`}>
                                     <MusicCardList isInlineList={true} {...this.props} musicArray={this.state.data}>
@@ -197,4 +194,4 @@ export class NewMusicsTemplate extends Component {
     }
 }
 
-export default withRouter(NewMusicsTemplate)
+export default NhacTreMusicSlide

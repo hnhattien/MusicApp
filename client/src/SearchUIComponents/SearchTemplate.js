@@ -22,12 +22,24 @@ export class SearchTemplate extends Component {
     //         return true;
     //     }
     // }   
-  
+    // componentWillMount = ()=>{
+    //     if(localStorage.getItem("searchHistory") === null){
+    //         localStorage.setItem("searchHistory",[]);
+    //     }
+    // }
     searchInputHandle = async (ev) => {
         this.props.toggleLoading(true);
         
         if(String(ev.target.value).match(new RegExp("[A-Z0-9]","gi")) !== null){
-            
+            // if(String(ev.target.value).length > 4){
+            //     if(localStorage.getItem("searchHistory")){
+            //         let searchHistory = JSON.parse(localStorage.getItem("searchHistory"));
+            //         localStorage.setItem("searchHistory",[...searchHistory,ev.target.value]);
+            //     }
+            //     else{
+            //         localStorage.setItem("searchHistory",[ev.target.value]);
+            //     }
+            // } 
             let urlFetch = `/search/${ev.target.value}`;
             fetch(urlFetch).then((res)=>{
                 return res.json()
@@ -64,11 +76,11 @@ export class SearchTemplate extends Component {
     render(){
         let contentRender = "";
         if(this.state.searchValue.length === 0){
-            contentRender = "Input"
+            contentRender = "Content when not type input yet";
         }
         else{
     
-            contentRender = <SearchContent {...this.props} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} searchValue={this.state.searchValue} data={this.state.data} ></SearchContent>
+            contentRender = <SearchContent isSearch={true} {...this.props} requestPlayMusicFromSlug={this.props.requestPlayMusicFromSlug} searchValue={this.state.searchValue} data={this.state.data} ></SearchContent>
             
         }
         
@@ -79,7 +91,9 @@ export class SearchTemplate extends Component {
             </Header>
    
             {contentRender}
-            
+            {/* {JSON.parse(localStorage.getItem("searchHistory")).map((his)=>{
+                return <h1>{his}</h1>
+            })} */}
         </div>
          )
                

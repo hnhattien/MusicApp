@@ -8,11 +8,7 @@ export class AvatarCustomizeMenu extends Component {
                 <li onClick={this.props.changeAvatar} className="list-group-item" role="button">
                     <span><strong>Change avatar</strong></span>
                 </li>
-                <li className="list-group-item" role="button">
-                    <span>
-                        <strong>Edit avatar</strong>
-                    </span>
-                </li>
+                
             </ul>
             
             </>

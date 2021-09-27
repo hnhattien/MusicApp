@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import CurrentPlaylistTemplate from './CurrentPlaylistTemplate';
+import {NavLink} from 'react-router-dom';
 export class PlayerTop extends Component {
     constructor(props){
         super(props);
@@ -17,10 +18,10 @@ export class PlayerTop extends Component {
                         <img className={`player-thumbnail rounded-circle ${spinnerClass}`} src={`/upload/musics/thumbnails/${currentMusic && currentMusic.music_thumbnail}`}>
                         </img>
                     </div>
-                    <div className="player-info-wrap text-center">
-                        <h6 className="text-white song-name text-center">{currentMusic && music.title}</h6>
+                    <div className="player-info-wrap mt-5">
+                        <h6 className="text-white song-name text-center"><NavLink to={`/song/${currentMusic.music_slug}`}>{currentMusic && music.title}</NavLink></h6>
                         
-                        <span className="text-white artist-name d-block">{currentMusic && music.artist_name}</span>
+                        <h6 className="text-white text-center">{currentMusic && music.artist_name}</h6>
                     </div>
                 </div>
                 <CurrentPlaylistTemplate {...this.props} playlist={this.props.getPlaylist()}></CurrentPlaylistTemplate>

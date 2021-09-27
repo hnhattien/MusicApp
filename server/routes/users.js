@@ -1,7 +1,10 @@
 var express = require('express');
 var router = express.Router();
 let bcrypt = require("bcrypt");
+let crypto = require('crypto');
 const fs = require('fs');
+require('dotenv').config();
+const nodemailer = require("nodemailer");
 let db = require("../databases/DatabaseConnection");
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -88,8 +91,38 @@ router.get("/:id",(req, res, next)=>{
   }
 })
 
-router.post("/changepassword", (req, res) => {
-  if(req.user){
+router.post("/changepassword", async (req, res) => {
+  if(req.body.selector){ //For reset for forget password 
+      let selector = req.body.selector
+      let resultEmail;
+      try{
+        resultEmail = await db.query("SELECT useremail FROM resetpassword WHERE selector = ?",[selector]);
+        if(resultEmail.length <= 0){
+            res.send({error: {message: "Something error!"}});
+        }
+        else{
+          let userPassword = req.body.password;
+          let hashedPassword = bcrypt.hashSync(userPassword,10);
+          let sqlUpdate = `UPDATE user SET password=? WHERE email=?`;
+          db.query(sqlUpdate, [hashedPassword, resultEmail[0]['useremail']]).then(result=>{
+            res.send({"message": "Update password successfull."});
+          }).catch(err=>{
+            res.send({error: {message: String(err)}});
+          }).then(()=>{
+            let sqlDelete = "DELETE FROM resetpassword WHERE selector = ? OR expires < ?";
+            db.query(sqlDelete,[selector,new Date().valueOf()]).catch(err=>{
+              console.log(err);
+            });
+          }) 
+        }
+        
+      }catch(err){
+         res.send({error: {message: String(err)}});
+      }
+
+      
+  }
+  else if(req.user){
     let sqlSelect = `SELECT password FROM user WHERE id=?`;
     db.query(sqlSelect, [req.user.id]).then(result=>{
       if(result[0]){
@@ -120,4 +153,89 @@ router.post("/changepassword", (req, res) => {
 })
 
 
+router.post("/resetpassword",(req, res, next)=>{
+  let username = req.body.username;
+  let sql = `SELECT email FROM user WHERE username=? OR email=?`;
+  db.query(sql,[username,username]).then((result)=>{
+      if(result.length === 0){
+        res.send({error: {message: "No any user with username or email you provide."}});
+      }
+      else{
+        let userEmail = result[0]['email'];
+        let token = crypto.randomBytes(20).toString("hex");
+        let selector = crypto.randomBytes(9).toString("hex");
+        let expires = new Date().valueOf() + 600000;
+        let sqlInsert = `INSERT resetpassword(selector,useremail,token,expires)VALUES(?,?,?,?)`;
+        let hashToken = bcrypt.hashSync(token,10);
+        db.query(sqlInsert,[selector,userEmail,hashToken,expires]).then(async (result)=>{
+          let testAcc = await nodemailer.createTestAccount();
+          let transporter = nodemailer.createTransport({
+            service: "Gmail",
+            host: "smtp.ethereal.email",
+            port: 465,
+            secure: true,
+            auth: {
+              user: "artificialintelligence0105@gmail.com",
+              pass: process.env.PASSGMAIL
+            }
+
+          });
+       
+          try{
+            let infoEmail = await transporter.sendMail({
+              from: "Sunwarder <artificialintelligence0105@gmail.com>",
+              to: userEmail,
+              subject: "Reset Password",
+              html: `<h1>Reset Password For SE447-E Music App</h1>`+
+              `<h1><a href='http://${req.hostname}:3000/resetpassword?sel=${selector}&token=${token}'>Click here to reset password.</a></h1>`
+            })
+            console.log(infoEmail.messageId);
+            res.send({message: "Check email for reset password."});
+          }
+          catch(err){
+            res.send({error: {message: String(err)}});
+          }
+          
+
+        }).catch(err=>{
+          res.send({error: {message: String(err)}});
+        })
+
+      }
+  }).catch(err=>{
+    res.send({error: {message: String(err)}});
+  })
+})
+
+router.post("/authresetpassword",(req, res, next)=>{
+  let sel = req.body.sel;
+  let userToken = req.body.token;
+  let hexRegex = /^[0-9a-fA-F]+$/;
+  if(hexRegex.test(sel) && hexRegex.test(userToken)){
+    let sqlSelect = `SELECT * FROM resetpassword WHERE selector=? AND expires > ?`;
+    db.query(sqlSelect,[sel, new Date().valueOf()]).then(result=>{
+      if(result.length === 0){
+        res.send({error: {message: "Token was expires!"}});
+      }
+      else{
+        
+        let hashedUserToken = result[0]['token'];
+        console.log(console.log(userToken,hashedUserToken));
+        if(bcrypt.compareSync(userToken,hashedUserToken)){
+          res.send({isAuth: true,message: "Request Reset password success!"});
+        }
+        else{
+          res.send({error: {message: "Token is invalid."}});
+        }
+      }
+    }).catch((err)=>{
+      res.send({error:{message: String(err)}});  
+    })
+
+  }
+  else{
+    console.log(sel,userToken)
+    res.send({error:{message: "Token is invalid!"}});
+  }
+})
 module.exports = router;

@@ -1,25 +1,56 @@
 .banner-list{
     width: max-content;
-    overflow-x: scroll;
-    animation: banner-slider;
-    animation-duration: 60s;
-    animation-iteration-count: infinite;
+    overflow-x: hidden;
+    position: relative;
+    height: 350px;
+
+}
+.banner-list li{
+    transform: translateX(400%);
+}
+.banner-list li.active{
+    transform: translateX(200px);
+    z-index: 1000;
+}
+.banner-list li.prev{
+    transform: translateX(-200px);
+}
+.banner-list li.next{
+    transform: translateX(100%);
+}
+
+.banner-list li{
+    position: absolute;
 }
 .banner-slider-wrap{
-    
+   width: 100%;   
 }
 .banner-list-wrap{
   overflow: hidden;
+  width: 90%;
+  position: relative;
+  border-radius: 5px;
 }
 .banner-list img{
-    height: 400px;
+    height: 300px;
     
 }
-
 .banner-list li.active{
-    margin: auto;
-}
 
+}
+.banner-list li{
+    margin: auto;
+    animation: banner-slider;
+    animation-duration: 60s;
+    animation-iteration-count: infinite;
+    transition-property: transform;
+    transition-timing-function: linear;
+    transition-duration: 1s;
+    
+}
+.banner-list.pause li {
+    animation-play-state: paused;
+}
 /* @keyframes banner-slider {
     from{
        transform: translateX(0px);
@@ -28,3 +59,51 @@
         transform: translateX(-4129px);
     }
 } */
+
+.foreground-slider{
+    background-color: rgba(10, 10,10,0.6);
+    display: flex;
+    flex-flow: row-reverse;
+    justify-content: space-between;
+
+}
+
+.foreground-slider .slide-btn-wrap{
+    display: none;
+    transition-property: display;
+    transition-timing-function: ease;
+    transition-duration: 500ms;
+}
+.foreground-slider .slide-btn-wrap .slide-btn{
+    background-color: rgba(10, 10,10,0.6);
+    border-radius: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin: auto;
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 50px;
+ 
+}
+
+.slide-btn-wrap.show{
+    display: flex !important;
+}
+
+.slide-thumb i{
+    color: rgba(10, 10,10,0.6) !important;
+}
+.slide-thumb{
+    margin: 5px;
+}
+.slide-thumb.active i{
+    color: rgb(255, 255, 255) !important;
+}
+
+.slide-thumb-wrap{
+    bottom: 20px;
+}
+
+.banner-slider-wrap{
+    top: 2rem;
+}

@@ -43,6 +43,24 @@ export class App extends Component {
     }
   }
   
+  //Remember scroll
+
+  componentDidMount = () => {
+    window.addEventListener("scroll",this.rememberScroll,true)
+  }
+
+  rememberScroll = () => {
+    const scrollLength = document.body.scrollTop || document.documentElement.scrollTop;
+    console.log(scrollLength, "Length")
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    console.log(height,"Heigh")
+  }
+
+
+
+  componentWillUnmount = () => {
+    window.removeEventListener("scroll", this.rememberScroll, true);
+  }
   // componentWillMount = () => {
   //   fetch('/loginstatus').then(result=>{
   //     console.log(result);
@@ -107,9 +125,9 @@ export class App extends Component {
       playlist: newPlaylist
     })
   }
-  setCurrentMusic = (data)=>{
+  setCurrentMusic = (music)=>{
 
-    this.setState({currentMusic: data,currentTime: 0},()=>{
+    this.setState({currentMusic: music,currentTime: 0},()=>{
       if(this.audioRef.current){
         this.audioRef.current.currentTime = 0;
       }
@@ -120,11 +138,34 @@ export class App extends Component {
     return this.state.currentMusic;
   }
   requestPlayMusicFromSlug = (slug)=>{
-    console.log(slug);
-    console.log(this.state.playlist)
     console.log(this.state.playlist.filter(music=>music['music_slug'] === slug))
-    let targetMusic = this.state.playlist.filter(music=>music['music_slug'] === slug)[0];
-    this.setCurrentMusic(targetMusic);
+    let musicFromPlaylist = this.state.playlist.filter(music=>music['music_slug'] === slug);
+    if(musicFromPlaylist.length <= 0){
+      fetch(`/song/${slug}`).then((res)=>{
+           return res.json();
+      }).then((musicRes)=>{
+        if(typeof musicRes === typeof {}){
+          this.setCurrentMusic(musicRes);
+          console.log(musicRes,"Music Response")
+        }
+        else{
+          this.showMessage(true,"Response Format is invalid.","danger");
+        }
+      }).catch(err=>{
+        this.showMessage(true,String(err),"danger");
+      }).then(()=>{
+        setTimeout(()=>{
+          this.showMessage(false)
+        },3000);
+      })
+    }else{
+      
+      let targetMusic = musicFromPlaylist[0];
+      this.setCurrentMusic(targetMusic);
+      console.log(targetMusic,"targetd")
+      console.log(slug,"Request")
+    }
+    
   }
   playMusic = ()=>{
     if(this.state.currentMusic){
