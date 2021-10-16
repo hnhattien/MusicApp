@@ -1,0 +1,223 @@
+.animate-bars {
+    display: flex;
+    align-items: center;
+    width: 300px;
+    height: 40px;
+    overflow: hidden;
+    background-color: #e6e6ff;
+  }
+  .animate-bars div {
+    flex: 1 0 auto;
+    height: 100%;
+    margin: 0 -2px;
+    background-color: blue;
+    animation: animate-bar 300ms linear infinite alternate;
+    transform-origin: bottom;
+    opacity: 0;
+  }
+  .animate-bars div:first-child {
+    margin-left: 0;
+  }
+  .animate-bars div:last-child {
+    margin-right: 0;
+  }
+  .animate-bars div:nth-child(1) {
+    animation-duration: 613ms;
+    animation-delay: 256ms;
+  }
+  .animate-bars div:nth-child(2) {
+    animation-duration: 518ms;
+    animation-delay: 147ms;
+  }
+  .animate-bars div:nth-child(3) {
+    animation-duration: 507ms;
+    animation-delay: 354ms;
+  }
+  .animate-bars div:nth-child(4) {
+    animation-duration: 359ms;
+    animation-delay: 465ms;
+  }
+  .animate-bars div:nth-child(5) {
+    animation-duration: 693ms;
+    animation-delay: 286ms;
+  }
+  .animate-bars div:nth-child(6) {
+    animation-duration: 451ms;
+    animation-delay: 161ms;
+  }
+  .animate-bars div:nth-child(7) {
+    animation-duration: 447ms;
+    animation-delay: 205ms;
+  }
+  .animate-bars div:nth-child(8) {
+    animation-duration: 468ms;
+    animation-delay: 124ms;
+  }
+  .animate-bars div:nth-child(9) {
+    animation-duration: 569ms;
+    animation-delay: 286ms;
+  }
+  .animate-bars div:nth-child(10) {
+    animation-duration: 614ms;
+    animation-delay: 320ms;
+  }
+  .animate-bars div:nth-child(11) {
+    animation-duration: 428ms;
+    animation-delay: 392ms;
+  }
+  .animate-bars div:nth-child(12) {
+    animation-duration: 428ms;
+    animation-delay: 311ms;
+  }
+  .animate-bars div:nth-child(13) {
+    animation-duration: 732ms;
+    animation-delay: 208ms;
+  }
+  .animate-bars div:nth-child(14) {
+    animation-duration: 793ms;
+    animation-delay: 154ms;
+  }
+  .animate-bars div:nth-child(15) {
+    animation-duration: 610ms;
+    animation-delay: 400ms;
+  }
+  .animate-bars div:nth-child(16) {
+    animation-duration: 351ms;
+    animation-delay: 144ms;
+  }
+  .animate-bars div:nth-child(17) {
+    animation-duration: 538ms;
+    animation-delay: 336ms;
+  }
+  .animate-bars div:nth-child(18) {
+    animation-duration: 367ms;
+    animation-delay: 162ms;
+  }
+  .animate-bars div:nth-child(19) {
+    animation-duration: 652ms;
+    animation-delay: 319ms;
+  }
+  .animate-bars div:nth-child(20) {
+    animation-duration: 513ms;
+    animation-delay: 213ms;
+  }
+  .animate-bars div:nth-child(21) {
+    animation-duration: 451ms;
+    animation-delay: 297ms;
+  }
+  .animate-bars div:nth-child(22) {
+    animation-duration: 790ms;
+    animation-delay: 428ms;
+  }
+  .animate-bars div:nth-child(23) {
+    animation-duration: 589ms;
+    animation-delay: 347ms;
+  }
+  .animate-bars div:nth-child(24) {
+    animation-duration: 510ms;
+    animation-delay: 107ms;
+  }
+  .animate-bars div:nth-child(25) {
+    animation-duration: 566ms;
+    animation-delay: 74ms;
+  }
+  .animate-bars div:nth-child(26) {
+    animation-duration: 386ms;
+    animation-delay: 160ms;
+  }
+  .animate-bars div:nth-child(27) {
+    animation-duration: 450ms;
+    animation-delay: 172ms;
+  }
+  .animate-bars div:nth-child(28) {
+    animation-duration: 757ms;
+    animation-delay: 90ms;
+  }
+  .animate-bars div:nth-child(29) {
+    animation-duration: 435ms;
+    animation-delay: 120ms;
+  }
+  .animate-bars div:nth-child(30) {
+    animation-duration: 613ms;
+    animation-delay: 271ms;
+  }
+  .animate-bars div:nth-child(31) {
+    animation-duration: 515ms;
+    animation-delay: 246ms;
+  }
+  .animate-bars div:nth-child(32) {
+    animation-duration: 707ms;
+    animation-delay: 341ms;
+  }
+  .animate-bars div:nth-child(33) {
+    animation-duration: 798ms;
+    animation-delay: 393ms;
+  }
+  .animate-bars div:nth-child(34) {
+    animation-duration: 428ms;
+    animation-delay: 94ms;
+  }
+  .animate-bars div:nth-child(35) {
+    animation-duration: 583ms;
+    animation-delay: 382ms;
+  }
+  .animate-bars div:nth-child(36) {
+    animation-duration: 742ms;
+    animation-delay: 165ms;
+  }
+  .animate-bars div:nth-child(37) {
+    animation-duration: 653ms;
+    animation-delay: 421ms;
+  }
+  .animate-bars div:nth-child(38) {
+    animation-duration: 391ms;
+    animation-delay: 119ms;
+  }
+  .animate-bars div:nth-child(39) {
+    animation-duration: 432ms;
+    animation-delay: 140ms;
+  }
+  .animate-bars div:nth-child(40) {
+    animation-duration: 658ms;
+    animation-delay: 346ms;
+  }
+  .animate-bars-center div {
+    transform-origin: center;
+  }
+  @keyframes animate-bar {
+    0% {
+      transform: scaleY(0);
+      opacity: 0.8;
+    }
+    100% {
+      transform: scaleY(100%);
+      opacity: 0.4;
+    }
+  }
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+  }
+  body::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #0000eb;
+  }
+  h1 {
+    position: absolute;
+    top: 10px;
+    color: #777;
+  }
+  

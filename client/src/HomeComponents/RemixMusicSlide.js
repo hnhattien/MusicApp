@@ -132,9 +132,7 @@ export class RemixMusicSlide extends Component {
             this.props.showMessage(true,String(err),"danger");
         }
 
-        setTimeout(()=>{
-            this.props.showMessage(false);
-        },2000);
+       
         // await fetch("/index" ).then(res=>{
         //     return res.json();
         // }).then(data=>{

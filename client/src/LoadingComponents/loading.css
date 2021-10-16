@@ -3,7 +3,7 @@
     width: 100%;
     display: flex;
     flex-flow: column;
-    z-index: 1000;
+    z-index: 5000;
     justify-content: center;
     overflow: hidden;
     scroll-behavior: none;

@@ -138,3 +138,11 @@
     
 }
 
+div.music{
+    width: 200px;
+    height: 200px;
+}
+
+.music-wrap .action-on-music-wrap{
+    display: none;
+}

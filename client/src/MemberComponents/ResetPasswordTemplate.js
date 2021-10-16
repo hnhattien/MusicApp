@@ -45,9 +45,7 @@ export class ResetPasswordTemplate extends Component {
          }).catch(err=>{
              
          }).then(()=>{
-            setTimeout(()=>{
-                this.props.showMessage(false);
-            },4000);
+            
          })
        }
        else{

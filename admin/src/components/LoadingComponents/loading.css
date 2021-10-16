@@ -1,0 +1,25 @@
+.loading-container{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-flow: column;
+    z-index: 5000;
+    justify-content: center;
+    overflow: hidden;
+    scroll-behavior: none;
+    top: 0;
+    left: 0;
+
+}
+
+.loading-container img{
+  transform: scale(0.4);
+}
+
+.spinner-wrap{
+    font-size: 4rem;
+}
+
+.spinner-wrap span{
+    font-size: 4rem;
+}

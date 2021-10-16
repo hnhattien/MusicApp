@@ -73,9 +73,7 @@ class LoginForm extends Component{
             }
             this.props.showMessage(true,String(err),"warning",{x:"40%",y:"60%"});
         }).then(()=>{
-            setTimeout(()=>{
-                this.props.showMessage(false);
-            },1000);
+           
             this.props.toggleLoading(false);
         })
       }

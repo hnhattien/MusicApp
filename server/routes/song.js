@@ -4,7 +4,9 @@ const db = require("../databases/DatabaseConnection");
 const slug = require("slug");
 const splitArtist = require('../javascript-functions/split-artist');
 const fs = require('fs');
+const ROLE = require('../authenticate/RoleData.js');
 const crypto = require('crypto');
+const {pushNotification} = require('./extra-feature.js');
 //search mp3
 function queryArtistsFromArray(artists){
     let baseSqlSelectArtist = "SELECT * FROM artist WHERE ";
@@ -14,8 +16,8 @@ function queryArtistsFromArray(artists){
         artists.forEach((artist_name)=>{
             sqlQueryArtistList.push(`title='${artist_name}'`);
         })
-        let sqlSelect = `${baseSqlSelectArtist} ${sqlQueryArtistList.join(" OR ")}` 
-       
+        let sqlSelect = `${baseSqlSelectArtist} ${sqlQueryArtistList.join(" OR ")}`
+
         db.query(sqlSelect).then(result=>{
             console.log(result)
             if(result.length>0){
@@ -27,16 +29,16 @@ function queryArtistsFromArray(artists){
                     })
                     response.push(artistObject);
             })
-            }    
+            }
         }).catch((err)=>{
             console.log(err);
         })
 
-        
+
     }
 
     return response;
-    
+
 }
 
 router.get("/randomfetch/:num",async (req, res, next)=>{
@@ -48,16 +50,16 @@ router.get("/randomfetch/:num",async (req, res, next)=>{
         }
 
         res.send(response);
-        
+
     }).catch((err)=>{
         console.log(err);
     })
-    
 
-    
+
+
 })
 router.post("/updateview",(req, res, next)=>{
-    
+
     let id = req.body.musicId;
     if(id){
         let sqlUpdateView = `UPDATE music SET viewcount = viewcount+1 WHERE id=?`;
@@ -70,33 +72,54 @@ router.post("/updateview",(req, res, next)=>{
     else{
         res.send({error: {message: "Please give a music id"}})
     }
-    
+
 })
 router.get("/:slug",async (req,res,next)=>{
     let targetSlugSong = req.params.slug;
-    
-    let sqlSelectMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, l.lyrics, u.displayedName as editLyricBy FROM music m INNER JOIN artist a ON a.id = m.artist_id INNER JOIN lyrictable l ON m.id = l.songid INNER JOIN user u ON u.id = l.userid WHERE m.slug=?  UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, l.lyrics, u.displayedName as editLyricBy FROM music m INNER JOIN lyrictable l ON l.songid = m.id INNER JOIN user u ON u.id = l.userid WHERE m.artist_id IS NULL AND m.slug =?`;
+    let sqlSelectMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount FROM music m INNER JOIN artist a ON a.id = m.artist_id WHERE m.slug= ?  UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount FROM music m WHERE m.artist_id IS NULL AND m.slug = ?`;
+    let sqlSelectLyrics = `SELECT l.lyrics, u.displayedName as editLyricBy, m.slug FROM lyrictable l INNER JOIN music m ON l.songid = m.id INNER JOIN user u ON l.userid = u.id WHERE m.slug = ?`;
+    //let sqlSelectMusic = `SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, a.thumbnail as artist_thumbnail, m.audio, m.slug as music_slug, a.slug as artist_slug, m.viewcount, l.lyrics, u.displayedName as editLyricBy FROM music m INNER JOIN artist a ON a.id = m.artist_id INNER JOIN lyrictable l ON m.id = l.songid INNER JOIN user u ON u.id = l.userid WHERE m.slug=?  UNION SELECT m.id, m.upload_time, m.title, m.artist_id, m.artist_name, m.thumbnail as music_thumbnail, m.artist_id as artist_thumbnail , m.audio, m.slug as music_slug, m.artist_id as artist_slug, m.viewcount, l.lyrics, u.displayedName as editLyricBy FROM music m INNER JOIN lyrictable l ON l.songid = m.id INNER JOIN user u ON u.id = l.userid WHERE m.artist_id IS NULL AND m.slug =?`;//
     let response = {};
-
-    db.query(sqlSelectMusic, [targetSlugSong, targetSlugSong]).then(result=>{
-        response = result[0];
+    db.query(sqlSelectMusic, [targetSlugSong, targetSlugSong]).then(async (result)=>{
+      console.log(result);
+        if(result.length > 0){
+          try {
+            let resLyrics = await db.query(sqlSelectLyrics,[targetSlugSong]);
+            let music = result[0];
+            if(resLyrics.length > 0){
+              music.lyrics = resLyrics[0]['lyrics'];
+              music.editLyricBy =  resLyrics[0].editLyricBy;
+            }
+            else{
+              music.lyrics = "";
+              music.editLyricBy = null;
+            }
+            console.log(music);
+            res.send(music);
+          }catch(err){
+            console.log(err);
+             res.send({error: {message: String(err)}});
+          }
+          response = result[0];
+        }
+        else{
+          res.send({});
+        }
     }).catch(err=>{
-        response['error'] = {message: String(err)}
-        
-    }).then(()=>{
-        res.send(response);
-    })
-        
+      res.send({error: {message: String(err)}});
 
-   
-    
-    
+    })
+
+
+
+
+
 })
 
 router.post("/heartaction",async (req, res, next) => {
-    
+
     if(req.user){
-        // Check this action is unheart or heart 
+        // Check this action is unheart or heart
         let songid = req.body.songid;
         let userid = String(req.user.id);
         let sqlSelectCheck="SELECT * FROM liketable WHERE userid=? AND songid=?";
@@ -114,7 +137,7 @@ router.post("/heartaction",async (req, res, next) => {
                    })
 
 
-                   
+
                 }).catch(err=>{
                     res.send({error: {message: String(err)}});
                 })
@@ -125,13 +148,13 @@ router.post("/heartaction",async (req, res, next) => {
                 db.query(sqlRemoveLike,[req.user.id, req.body.songid]).then(resultUnheart=>{
                     db.query(sqlSelectAffectedMusic,[songid,songid]).then((resultMusic)=>{
                         let affectedMusic = resultMusic[0];
-                        res.send({message: "Unliked", isLike: false, music: affectedMusic});     
+                        res.send({message: "Unliked", isLike: false, music: affectedMusic});
                     })
-                   
+
                 }).catch(err=>{
                     res.send({error: {message: String(err)}});
                 })
-            } 
+            }
         }).catch(err=>{
             console.log("Hi");
             res.send({error: {message: String(err)}});
@@ -165,22 +188,29 @@ router.post("/upload", async(req, res, next) => {
               let result = await db.query(sqlSelectSlug);
               if(result.length === 0){
                 isDuplicate = false;
-              }      
+              }
             }
             catch(err){
               console.log(err);
             }
-            
-            
-          } 
+
+
+          }
         db.query(sqlInsertSong, [songname,slugData,artistname,category,thumbnailfilename, songfilename ]).then(result=>{
+          const notify = {
+            title: `${req.user.displayedName} vừa đăng tải một bài hát mới.`,
+            type: "song",
+            thumbnail: "defaultsong.png",
+            iconclasses: 'fas fa-music'
+          };
+          pushNotification(notify);
             let sqlInitalLyrics = `INSERT INTO lyrictable(songid,lyrics)VALUES(?,?)`;
             db.query(sqlInitalLyrics,[result['insertId'],'']).then(()=>{
                 res.send({message:"Upload song success"});
             }).catch(err=>{
                 res.send({error: {message: String(err)}});
             });
-            
+
         }).catch(err =>{
             res.send({error: {message: String(err)}});
         })
@@ -201,17 +231,17 @@ router.get("/category/:catslug",(req, res, next)=>{
                 db.query(sqlSelect,[slug,slug]).then((result)=>{
                     res.send(result);
                 }).catch(err=>{
-                    res.send({error: {message: String(err)}});    
+                    res.send({error: {message: String(err)}});
                 })
             }
             catch(err){
-                
+
                 res.send({error: {message: String(err)}});
             }
         }
-        
 
-    
+
+
 })
 
 router.get("/album/:albumslug",(req, res, next)=>{
@@ -224,22 +254,22 @@ router.get("/album/:albumslug",(req, res, next)=>{
             db.query(sqlSelect,[slug,slug,slug,slug]).then((result)=>{
                 res.send(result);
             }).catch(err=>{
-                res.send({error: {message: String(err)}});    
+                res.send({error: {message: String(err)}});
             })
         }
         catch(err){
-            
+
             res.send({error: {message: String(err)}});
         }
     }
-    
+
 
 
 })
 
 router.post("/updatelyrics",(req, res, next)=>{
     let songId = req.body.songId;
-    
+
     if(req.user){
         if(songId){
             let lyrics = req.body.lyrics;

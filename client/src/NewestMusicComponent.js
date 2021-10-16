@@ -25,9 +25,9 @@ export class NewestMusicComponent extends Component {
               this.props.showMessage(true,String(err),"danger");
           }
   
-          setTimeout(()=>{
-              this.props.showMessage(false);
-          },2000);
+        //   setTimeout(()=>{
+        //       this.props.showMessage(false);
+        //   },4000);
     }
     render() {
         console.log(this.props);

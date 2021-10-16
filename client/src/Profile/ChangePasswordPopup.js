@@ -55,9 +55,7 @@ export class ChangePasswordPopup extends Component {
                 this.props.showMessage(true,String(err),"danger",{x:"40%",y:"60%"});  
             }).then(() => {
                 this.props.toggleLoading(false);
-                setTimeout(()=>{
-                    this.props.showMessage(false);      
-                },4000);
+                
             })
         }
     }

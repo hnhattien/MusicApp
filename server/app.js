@@ -13,7 +13,7 @@ let albumRouter = require("./routes/album");
 let adminRouter = require("./routes/admins/admin");
 let categoryRouter = require("./routes/category");
 let authRouter = require('./routes/auth/auth.js');
-
+let notificationRouter = require('./routes/admins/notifications.js');
 
 var passport = require('passport')
 let flash = require('express-flash');
@@ -61,7 +61,7 @@ app.use("/artist",artistRouter)
 app.use("/auth", authRouter);
 app.use("/category",categoryRouter);
 app.use('/album',albumRouter);
-
+app.use("/notifications",notificationRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
@@ -83,4 +83,3 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
-

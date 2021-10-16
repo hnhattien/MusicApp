@@ -64,10 +64,26 @@ export class NhacPhimMusicSlide extends Component {
     componentWillUnmount = () => {
         clearInterval(this.state.getOffsetWidthSlideInterval);
     }
-    componentDidMount = ()=>{
+    componentDidMount = async ()=>{
+
        window.addEventListener("resize",this.handleResize);
        this.initialSlideInterval();
+       try {
+        let res = await fetch('/song/category/nhac-phim');
+        let musics = await res.json();
+        
+        if(musics.error){
+          this.props.showMessage(true,musics.error.message,"danger");
+        }
+        else{
+          console.log(musics)
+          this.setState({data: musics});
+        }
+      }catch(err){
+          this.props.showMessage(true,String(err),"danger");
+      }
 
+     
     }
     nextSlide = () => {
         if(this.state.translate.x < this.state.slideListWidth){
@@ -116,50 +132,12 @@ export class NhacPhimMusicSlide extends Component {
     }
 
 
-    componentWillMount = async () => {
-        try {
-          let res = await fetch('/song/category/nhac-phim');
-          let musics = await res.json();
-          
-          if(musics.error){
-            this.props.showMessage(true,musics.error.message,"danger");
-          }
-          else{
-            console.log(musics)
-            this.setState({data: musics});
-          }
-        }catch(err){
-            this.props.showMessage(true,String(err),"danger");
-        }
-
-        setTimeout(()=>{
-            this.props.showMessage(false);
-        },2000);
-        // await fetch("/index" ).then(res=>{
-        //     return res.json();
-        // }).then(data=>{
-        
-        //   if(data['musics']){
-        //     if(this.state.currentMusic === null){
-        //       this.setState({
-        //         currentMusic: data['musics'][data['musics'].length-1],
-        //         newMusics: data['musics']
-        //       },()=>{
-        //         console.log(this.state.newMusics)
-        //       })
-        //     }
-           
-            
-           
-        //   }     
-        // })    
-    }
     render() {
         return (
             <>
                 <div style={{top: this.props.styleTop}} className={`row new-music-slider-wrap ${this.props.cardSlideClass}`}>
 
-                    <div className="col-12 slide-wrap">
+                    <div className="col-12 slide-wrap" id="nhacphimslideWrap">
                         <div className="new-songs-link-wrap">
                         
                             <div className="top-slide">

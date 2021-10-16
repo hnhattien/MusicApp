@@ -38,20 +38,19 @@ export class ActionOnMusicTemplate extends Component {
                 
                 this.props.showMessage(true,String(dataRes.error.message),"danger",{x:"40%",y:"60%"});  
              }
-             else{                                
-                this.props.showMessage(true,String(dataRes.message),"secondary",{x:"40%",y:"60%"});            
-                
+             else{                                                
                 this.props.updateHeartChanges(dataRes['music']);
-                
+                this.props.showMessage(true, "Liked", "secondary");
              }
            }).catch(err=>{
             
                 this.props.showMessage(true,String(err),"danger",{x:"40%",y:"60%"});  
-           }).then(()=>{
-               setTimeout(()=>{
-                   this.props.showMessage(false);
-               },600);
            })
+        //    .then(()=>{
+        //        setTimeout(()=>{
+        //            this.props.showMessage(false);
+        //        },4000);
+        //    })
         }
     }
     render() {

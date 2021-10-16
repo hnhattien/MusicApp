@@ -15,7 +15,11 @@ export class UploadTemplate extends Component {
             thumbnailBlob: ''
         }
     }
-
+    componentDidMount = (ev) => {
+        if(localStorage.getItem("userid") === null){
+            this.props.history.push('/login');
+        }
+    }
     handleUploadSongThumbnail = (ev) => {
         if(this.songThumbnailInputRef){
             this.songThumbnailInputRef.current.click();
@@ -86,9 +90,7 @@ export class UploadTemplate extends Component {
                 this.props.showMessage(true,String(err),"danger");
             }).then(()=>{
                 this.props.toggleLoading(false);
-                setTimeout(() => {
-                    this.props.showMessage(false);
-                },1000);
+               
             })
         }
     }

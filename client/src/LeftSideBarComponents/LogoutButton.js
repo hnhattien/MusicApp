@@ -28,10 +28,7 @@ export class LogoutButton extends Component {
         }).then(()=>{
           this.props.toggleLoading(false);
           this.props.toggleSettingMenu();
-          setTimeout(()=>{
-            this.props.showMessage(false);
-            
-          },2000)
+          
         })
         
       }

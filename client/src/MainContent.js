@@ -20,6 +20,7 @@ import UploadTemplate from './ContentComponents/UploadTemplate';
 import NewestMusicComponent from './NewestMusicComponent';
 import CategoryTemplate from './ContentComponents/CategoryTemplate';
 import AlbumTemplate from './ContentComponents/AlbumTemplate';
+import ArtistInfoTemplate from './ContentComponents/ArtistInfoTemplate';
 export class MainContent extends Component {
     constructor(props){
         super(props);
@@ -40,68 +41,75 @@ export class MainContent extends Component {
                     categories: dataRes
                 })
             }
-            
+
         }).catch(err=>{
             this.props.showMessage(true,String(err),"danger");
-        }).then(()=>{
-            setTimeout(() => {
-                this.props.showMessage(false,);
-            },1000);
         })
+        // .then(()=>{
+        //     setTimeout(() => {
+        //         this.props.showMessage(false,);
+        //     },4000);
+        // })
     }
     componentDidMount = () => {
         this.getCategories();
     }
     render(){
-        
+
         return (
-            
+
             <div className="col bg-dark p-0 position-relative">
                 <Switch>
                     <Route path='/' exact={true} render={(routeProps)=><HomeTemplate {...this.props} ></HomeTemplate>
                     }/>
-                        
-                    
+
+
                     <Route path="/search" exact={true} render={(routeProps)=>{return <><SearchTemplate {...this.props}/></>}}/>
                     <Route path="/rank" exact={true} render={(routeProps)=><RankTemplate {...this.props}></RankTemplate>}/>
-                    
+
                     <Route path={"/category/:slug"} exact={true} render={(routeProps)=>{
-                        return <CategoryTemplate categorySlug={routeProps.match.url} {...this.props} />
+                        return <CategoryTemplate {...routeProps} categorySlug={routeProps.match.url} {...this.props} />
                     }}/>
                     <Route path={"/album/:slug"} exact={true} render={(routeProps)=>{
-                        return <AlbumTemplate albumSlug={routeProps.match.url} {...this.props} />
+                        return <AlbumTemplate {...routeProps} albumSlug={routeProps.match.url} {...this.props} />
                     }}/>
-                    <Route path="/discover/category" exact={true} render={(routeProps)=><DiscoverTemplate isCategory={true} {...this.props}></DiscoverTemplate>}></Route>
-                    <Route path="/discover/album" exact={true} render={(routeProps)=><DiscoverTemplate isAlbum={true} {...this.props}></DiscoverTemplate>}></Route>
+                    <Route path="/discover/category" exact={true} render={(routeProps)=><DiscoverTemplate {...routeProps} isCategory={true} {...this.props}></DiscoverTemplate>}></Route>
+                    <Route path="/discover/album" exact={true} render={(routeProps)=><DiscoverTemplate {...routeProps} isAlbum={true} {...this.props}></DiscoverTemplate>}></Route>
                     <Route path="/song/:song" exact={true} render={(routeProps)=>{
-                       
-                    return <MusicInfoTemplate {...this.props} musicSlug={routeProps.match.url}></MusicInfoTemplate>
+
+                    return <MusicInfoTemplate {...routeProps} {...this.props} musicSlug={routeProps.match.url}></MusicInfoTemplate>
                     }} />
 
-                    
-                    <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...this.props}></LoginTemplate>}></Route>
-                    <Route path="/signup" render={(routeProps) => <SignupTemplate {...this.props}/>} exact={true}></Route>
+                    <Route path="/artist/:artist" exact={true} render={(routeProps)=>{
+
+                       return <ArtistInfoTemplate {...this.props} artistSlug={routeProps.match.url}></ArtistInfoTemplate>
+                    }} />
+
+
+                    <Route path="/login" exact={true} render={(routeProps)=><LoginTemplate {...routeProps} {...this.props}></LoginTemplate>}></Route>
+                    <Route path="/signup" render={(routeProps) => <SignupTemplate {...routeProps} {...this.props}/>} exact={true}></Route>
                     <Route path="/forgetpassword" render={(routeProps) => <ForgetPasswordTemplate {...this.props}/>} exact={true}></Route>
                     <Route path="/resetpassword" render={(routeProps) => <ResetPasswordTemplate {...this.props}/>} exact={true}></Route>
                     <PrivateRoute componentProps={this.props} component={ProfileSetting} path={'/profile/setting'} auth={localStorage.getItem("userid") !== null} ></PrivateRoute>
                     <PrivateRoute componentProps={this.props} component={Profile} path={'/profile'} auth={localStorage.getItem("userid") !== null}/>
-                    <Route path="/upload" exact={true} render={(routerProps) => {
+                    <Route path="/upload" exact={true} render={(routeProps) => {
                         console.log(this.state.categories);
-                        return <UploadTemplate categories={this.state.categories} {...this.props} /> ;
-                    }} 
+
+                        return <UploadTemplate categories={this.state.categories} {...routeProps} {...this.props} /> ;
+                    }}
                     />
                     <Route path="/newest" exact={true} render={()=>{
                           return <NewestMusicComponent {...this.props}></NewestMusicComponent>
                     }}>
                     </Route>
                     <Redirect from='/home' to='/' exact={true}></Redirect>
-                    
+
 
                 </Switch>
-                
-                
+
+
             </div>
-           
+
         )
     }
 }

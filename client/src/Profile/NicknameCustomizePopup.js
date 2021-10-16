@@ -41,9 +41,7 @@ export class NicknameCustomizePopup extends Component {
             this.props.toggleLoading(false);
             this.props.toggleNicknameEditorPopup();
             this.props.updateUserChanges();
-            setTimeout(()=>{
-                this.props.showMessage(false);      
-            },500);
+            
         })
     }
     render() {

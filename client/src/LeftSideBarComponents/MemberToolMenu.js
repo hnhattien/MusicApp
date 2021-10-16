@@ -20,7 +20,7 @@ export class MemberToolMenu extends Component{
                    
 
                 </div>
-                    <SettingButton {...this.props}/>
+                    {localStorage.getItem("userid") !== null && <SettingButton {...this.props}/>}
             </div>
         )
     }

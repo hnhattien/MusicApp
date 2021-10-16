@@ -17,7 +17,7 @@ export class SignupForm extends Component {
             validator:{
                toEmail: {isValid: false, text:""},
                toUsername: {isValid: false, text:""},
-               toPassword: {isValid: false, text: ""}                
+               toPassword: {isValid: false, text: ""}
             }
         }
     }
@@ -157,9 +157,9 @@ export class SignupForm extends Component {
         }
     }
     handleSignup = (ev) => {
-        let username = this.state.username, 
-        email=this.state.email, 
-        password=this.state.password, 
+        let username = this.state.username,
+        email=this.state.email,
+        password=this.state.password,
         repeatpassword=this.state.repeatpassword;
         ev.preventDefault();
         //Frontend validate
@@ -187,21 +187,19 @@ export class SignupForm extends Component {
             }).then(data=>{
                 console.log(data);
                 if(data['error']){
-                    this.props.showMessage(true,data['message'],'danger');     
+                    this.props.showMessage(true,data.error.message,'danger');
                 }
                 else{
                     this.props.showMessage(true,data['message'],'success');
-                    
+                    this.props.history.push('/login');
                 }
-               
+
             }).catch(err=>{
                 this.props.showMessage(true,String(err),'warning');
             }).then(()=>{
                 this.props.toggleLoading(false);
-                setTimeout(()=>{
-                    this.props.showMessage(false);
-                    this.props.history.push('/login');
-                },2000);
+
+
             })
         }
     }
@@ -213,18 +211,18 @@ export class SignupForm extends Component {
     render(){
         return(
             <form onSubmit={this.handleSignup} className="form-group" method="POST">
-                
+
                 <FloatingForm>
                     <InputForm value={this.state.username} handleChange={this.handleChange} placeholder="nhattien15" name="username" id="username" type="text" classes="form-control bg-dark text-white" ></InputForm>
                     <InvalidFeedbackLabel validator={this.state.validator.toUsername}/>
                     <LabelForm for={"username"} text="Username"></LabelForm>
                 </FloatingForm>
-                
+
                 <FloatingForm>
                     <InputForm value={this.state.email} handleChange={this.handleChange} placeholder="name@example.com" id="email" name="email" type="email" classes="form-control bg-dark text-white" ></InputForm>
                     <InvalidFeedbackLabel validator={this.state.validator.toEmail}/>
                     <LabelForm for={"email"} text="Email"></LabelForm>
-                    
+
                 </FloatingForm>
 
                 <FloatingForm>

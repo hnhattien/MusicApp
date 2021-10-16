@@ -1,316 +1,517 @@
-const express = require("express");
-const router = express.Router();
-const musicdata = require("../../data/data")
-const mysql = require("mysql");
-const musiclist = require("../../data/musiclist.js");
-const categorydata = require("../../data/categorydata");
+const router = require('express').Router();
 const db = require("../../databases/DatabaseConnection");
-const {connectDB} = require("../../databases/DatabaseConnection");
 const crypto = require('crypto');
 const slug = require('slug');
 const capitalize = require('../../javascript-functions/capitalize.js');
+let passport = require('passport');
+const ROLE = require('../../authenticate/RoleData.js');
+const fs = require('fs');
+router.get(`/`,async (req,res, next) => {
+  let sqlUser = `SELECT * FROM user`;
+  let sqlAlbum = `SELECT * FROM album`;
+  let sqlArtist = `SELECT * FROM artist`;
+  let sqlSong = `SELECT * FROM music`;
+  let sqlTodayUser = `SELECT * FROM user where joinday >= CURRENT_DATE AND joinday < date_add(CURRENT_DATE, INTERVAL 1 DAY)`
+  let sqlTodayAlbum = `SELECT * FROM album where madedate >= CURRENT_DATE AND madedate < date_add(CURRENT_DATE, INTERVAL 1 DAY)`;
+  let sqlTodaySong = `SELECT * FROM music where upload_time >= CURRENT_DATE AND upload_time < date_add(CURRENT_DATE, INTERVAL 1 DAY)`;
+  let sqlTodayArtist = `SELECT * FROM artist where adddate >= CURRENT_DATE AND adddate < date_add(CURRENT_DATE, INTERVAL 1 DAY)`;
+  let response = {userTotal: 0,todayNewUser: 0,
+    songTotal: 0, todayNewSong: 0,
+    albumTotal: 0, todayNewAlbum: 0,
+    artistTotal: 0, todayNewArtist: 0
 
-router.get("/database/createmusictable",(req, res)=>{
-  let sql = "CREATE TABLE music(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, audio text,thumbnail TEXT DEFAULT 'default.jpg',slug TEXT, artist_name text DEFAULT 'Unknown', cat_id int, public_year int DEFAULT year(curdate()), lyrics text, artist_id int, upload_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, viewcount int DEFAULT 0, FOREIGN KEY(artist_id) REFERENCES artist(id), FOREIGN KEY(cat_id) REFERENCES category(id))";
-  db.query(sql).then(()=>{
-    res.send("Music table was created");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-
-})
-
-router.get("/database/createcategorytable",(req,res)=>{
-  let sql = "CREATE TABLE category(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, slug TEXT)";
-  db.query(sql).then(()=>{
-    res.send("Category table created...");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-
-})
-
-router.get("/database/createartisttable",(req,res)=>{
-  let sql = "CREATE TABLE artist(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title text, thumbnail TEXT)";
-  db.query(sql).then(()=>{
-    res.send("Artist table created...");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-
-})
-router.get("/database/createusertable",(req,res)=>{
-  let sql = "CREATE TABLE user(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, username TEXT NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL, displayedName VARCHAR(100), avatar TEXT DEFAULT 'defaultavatar.png')"
-  db.query(sql).then(()=>{
-    res.send("User table created...");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-})
-
-router.get("/database/createresetpasswordtable", (req, res) => {
-  let sql = "CREATE TABLE resetpassword(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, selector TEXT, token TEXT, useremail TEXT)";
-  db.query(sql).then(()=>{
-    res.send("Resetpassword table created...");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-})
-router.get('/database/createalbumtable',(req,res)=>{
-  let sql = "CREATE TABLE album(id int AUTO_INCREMENT NOT NULL PRIMARY KEY, title TEXT DEFAULT 'Album is not named', artist_id int, cat_id int ,thumbnail TEXT, FOREIGN KEY(cat_id) REFERENCES music(cat_id),FOREIGN KEY(artist_id) REFERENCES music(artist_id))";
-  db.query(sql).then(()=>{
-    res.send("Album table created...");
-  }).catch(error=>{
-    res.send({error: {message: String(error)}});
-  })
-})
-router.get('/database/insertmusicfromapiintodatabase', async (req, res)=>{
-  musics = musicdata.music
-  musics.forEach(async (music) => {
-    let slugData;
-    let sqlSelectSlug;
-    let isDuplicate = true;
-    
-    while(isDuplicate){
-      slugData = `${slug(music.title,"-")}.${crypto.randomBytes(6).toString('hex')}`;
-      sqlSelectSlug = `SELECT * FROM music WHERE slug='${slugData}'`; //Check duplicate
-      try{
-        let result = await db.query(sqlSelectSlug)
-        if(result.length === 0){
-          isDuplicate = false;
-        }      
-      }
-      catch(err){
-        console.log(err);
-      }
-      
-      
-    }  
-  
-    
-    insertSql = `INSERT music(title,artist_name,lyrics,audio, thumbnail, slug) VALUES("${music.title}","${music.artist_name}","${mysql.escape(music.lyrics)}", "${music.mp3}", "${music.thumbnail}", "${slugData}")`
-    try{
-      let result = await db.query(insertSql);
-      res.send(result);
+  };
+  try{
+    let resultUser = await db.query(sqlUser);
+    let userTotal = resultUser.length;
+    if(userTotal > 0){
+      response.userTotal = userTotal;
     }
-    catch(err){
-      console.log(err);
-      res.send("Error")
+    let resultSong = await db.query(sqlSong);
+    let songTotal = resultSong.length;
+    if(songTotal > 0){
+      response.songTotal = songTotal;
     }
-  });
-  
+    let resultArtist = await db.query(sqlArtist);
+    let artistTotal = resultArtist.length;
+    if(artistTotal > 0){
+      response.artistTotal = artistTotal;
+    }
+    let resultAlbum = await db.query(sqlAlbum);
+    let albumTotal = resultAlbum.length;
+    if(albumTotal > 0){
+      response.albumTotal = albumTotal;
+    }
+   //New Content Today
+    let resultNewSong = await db.query(sqlTodaySong);
+    let newSongTotal = resultNewSong.length;
+    if(newSongTotal > 0){
+      response.todayNewSong = newSongTotal;
+    }
+
+    let resultNewAlbum = await db.query(sqlTodayAlbum);
+    let newAlbumTotal = resultNewAlbum.length;
+    if(newAlbumTotal > 0){
+      response.todayNewAlbum = newAlbumTotal;
+    }
+
+    let resultNewArtist = await db.query(sqlTodayArtist);
+    let newArtistTotal = resultNewArtist.length;
+    if(newArtistTotal > 0){
+      response.todayNewArtist = newArtistTotal;
+    }
+
+    let resultNewUser = await db.query(sqlTodayUser);
+    let newUserTotal = resultNewUser.length;
+    if(newUserTotal > 0){
+      response.todayNewUser = newUserTotal;
+    }
+
+    res.send(response);
+  }
+  catch(err){
+    res.send({error: {message: String(err)}});
+  }
+
+
+})
+router.post('/deleteuser',(req, res, next)=>{
+    if(req.user && req.user.role === ROLE.ADMIN){
+      if(req.body.id){
+        let sqlDelete = `DELETE FROM user WHERE id=? LIMIT 1`;
+        db.query(sqlDelete,[req.body.id]).then(result=>{
+          res.send({message: `Deleted ${req.body.username} from system.`});
+        }).catch(err=>{
+          res.send({error: {message: String(err)}});
+        })
+      }
+      else{
+        res.status(403).send({error: {message: "Bad Request. You must to provide a userId."}});
+      }
+    }
+    else{
+      res.send({error:{message: "You not permit to perform this action."}});
+    }
 })
 
-router.get('/database/insertcategoryfromapiintodatabase',async (req, res)=>{
-  let sql = ""
-  categorydata.forEach(async (cat) => {
-    
-    let sqlcheckduplicate = `SELECT * FROM category WHERE title="${cat.title}"`;
-    let sqlInsertCategory = `INSERT category(title,slug) VALUES("${cat.title}","${slug(cat.title)}")`;
-    console.log(sqlcheckduplicate,sqlInsertCategory)
-    try{
-      let result = await db.query(sqlcheckduplicate);
-      if(result.length === 0){
+router.post('/deletesong',async (req, res, next)=>{
+    if(req.user && req.user.role === ROLE.ADMIN){
+      if(req.body.songid){
+        let sqlEnableForeignKeyChecks = 'SET FOREIGN_KEY_CHECKS=1'; // to re-enable them
+        let sqlDelete = `SET FOREIGN_KEY_CHECKS=0; DELETE FROM music WHERE id=? LIMIT 1`;
+
         try{
-          let result = await db.query(sqlInsertCategory);
-          console.log(result);
-          res.send(result);
+          await db.query(sqlDelete,[req.body.songid]);
+          res.send({message: `Deleted music named ${req.body.songname} from system.`});
         }catch(err){
-
+          res.send({error: {message: String(err)}});
         }
       }
+      else{
+        res.status(403).send({error: {message: "Bad Request. You must to provide a songId."}});
+      }
     }
-    catch(err){
-      console.log(err);
+    else{
+      res.send({error:{message: "You not permit to perform this action."}});
     }
-    
-
-  });
-  
 })
+router.get("/song", async (req, res, next) => {
 
-router.get('/database/mapartistfrommusictoartistable',async (req, res)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    let sqlSelectSong = `SELECT * FROM music`;
+    db.query(sqlSelectSong).then(resultMusic=>{
+      res.send(resultMusic);
+    }).catch((err)=>{
+      res.send({error: {message: String(err)}});
+    })
+  }
+  else{
+    res.send({error: {message: "Yout not permit to see song infomation. Please login as admin."}})
+  }
+})
+router.post('/updatesong', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.music){
+      let sqlUpdate = `UPDATE music SET
+       title = ?,audio=?,thumbnail=?,
+       slug = ?, artist_name = ?, cat_id = ?,
+       public_year = ?,
+       artist_id = ?, viewcount = ? WHERE id=?`;
 
-  let sql = "SELECT artist_name FROM music";
-  
-  let artistArray = []
-  let result = await db.query(sql);
-  result.forEach(item => {
-    artistArray.push(item.artist_name.toString().toLowerCase());
-  })
-  console.log(artistArray);
-  let artistSet = new Set(artistArray)
-  artistArray = Array.from(artistSet).map(capitalize);
-  artistArray.forEach(async (artistname)=> {
-    let isDuplicated = true;
-    let slugData = "";
-    let sqlSelectSlug;
-    let hexString = '';
-    while(isDuplicated){
-      hexString = crypto.randomBytes(6).toString("hex");
-      slugData = `${slug(artistname,'-')}-${hexString}`;
-      sqlSelectSlug = `SELECT slug FROM artist WHERE slug='${slugData}'`;
       try{
-        let result = await db.query(sqlSelectSlug);
-        if(result.length === 0){
-          isDuplicated = false;
-        }
-      }
-      catch(err){
-        console.log(err);
+            let music = req.body.music;
+            await db.query(sqlUpdate,[
+              music.title,
+              music.audio,
+              music.thumbnail,
+              music.slug,
+              music.artist_name,
+              music.cat_id,
+              music.public_year,
+              music.artist_id,
+              music.viewcount,
+              music.id
+            ]);
+            res.send({message: `Updated music named ${music.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
       }
     }
-    // Check duplicate artist name
-    try{
-        let result = await db.query(`SELECT title FROM artist WHERE title ='${artistname}'`)
-        if(result.length === 0){
-          try{
-            let result = await db.query(`INSERT artist(title,slug) VALUEs("${artistname}", '${slugData}')`);
-            res.send(result);
-          }
-          catch(err){
-            console.log(err);
-          }
-        }
-    }catch(err){
-      console.log(err);
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a music id."}});
     }
-    //insert final valuie
-    
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
 
-  })  
-    
-    // Array.from(artists).forEach(artist=>{
-    //   db.query(`INSERT artist(title) VALUEs("${artist.title}")`,(err,result)=>{
-    //     if(err) throw err;
-    //     console.log(result)
-    //   })
-    // })
-  })
-  
-router.get('/database/mapartistidtomusictable',async (req,res,next)=>{
-    let sqlArtist = `SELECT * FROM artist`;
-    let sqlInsertToMusic;
-    try{
-      let resultArtist = await db.query(sqlArtist);
-      Array.from(resultArtist).forEach( async (artist)=>{
-        sqlInsertToMusic = `UPDATE music SET artist_id = ${artist.id} WHERE artist_name = '${artist.title}'`;
+router.post('/deleteartist', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.artistid){
+      let sqlEnableForeignKeyChecks = 'SET FOREIGN_KEY_CHECKS=1'; // to re-enable them
+      let sqlDelete = `SET FOREIGN_KEY_CHECKS=0; DELETE FROM artist WHERE id=? LIMIT 1; DELETE FROM music WHERE artist_id=?`;
 
-        try{
-          let result = await db.query(sqlInsertToMusic);
-          console.log(result);
-        }
-        catch(err){
-          console.log(err);
-        }
+      try{
+        await db.query(sqlDelete,[req.body.artistid,req.body.artistid]);
+        res.send({message: `Deleted artist named ${req.body.artistname} from system.`});
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a artistid."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.post('/updateartist', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.artist){
+      let sqlUpdate = `UPDATE artist SET
+       title = ?,thumbnail=?,
+       slug = ?
+         WHERE id=?`;
+
+      try{
+            let artist = req.body.artist;
+            await db.query(sqlUpdate,[
+              artist.title,
+              artist.thumbnail,
+              artist.slug,
+              artist.id
+            ]);
+            res.send({message: `Updated artist named ${artist.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a artist id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.post('/changeartistthumbnail', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.filename && req.body.base64Image && req.body.artistid){
+      let base64 = req.body.base64Image;
+      let filename = req.body.filename;
+
+      let rawData = base64.split(";base64,").pop();
+      fs.writeFile(`public/upload/images/${filename}`,rawData, {encoding: "base64"},(err)=>{
+
+      })
+      const sqlUpdate = `UPDATE artist SET thumbnail=? WHERE id= ?`;
+      db.query(sqlUpdate,[filename, req.body.artistid]).then(result => {
+        res.send({message: "Update avatar artist successfully."});
+      }).catch(err =>{
+        res.send({error: {message: String(err)}});
       })
     }
-    catch(err){
-      console.log(err);
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a file."}});
     }
-
-    res.send("Ok");
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
 })
 
-// router.get('/database/mapcatidtomusictable',async (req,res,next)=>{
-//   let sqlCategory = `SELECT * FROM category`;
-//   let sqlInsertToMusic;
-//   try{
-//     let resultCategory = await db.query(sqlCategory);
-//     Array.from(resultCategory).forEach( async (cat)=>{
-//       sqlInsertToMusic = `UPDATE music SET cat_id = ${cat.id} WHERE cat_name = '${cat.title}'`;
-      
-//       try{
-//         let result = await db.query(sqlInsertToMusic);
-//         console.log(result);
-//       }
-//       catch(err){
-//         console.log(err);
-//       }
-//     })
-//   }
-//   catch(err){
-//     console.log(err);
-//   }
+router.get('/album', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    let sqlSelectAlbum = `SELECT * FROM album`;
+    db.query(sqlSelectAlbum).then(resultAlbum => {
+      res.send(resultAlbum);
+    }).catch((err)=>{
+      res.send({error: {message: String(err)}});
+    })
+  }
+  else{
+    res.send({error: {message: "Yout not permit to see album infomation. Please login as admin."}})
+  }
+})
 
-//   res.send("Ok");
-// })
+router.post('/changealbumthumbnail', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.filename && req.body.base64Image && req.body.albumid){
+      let base64 = req.body.base64Image;
+      let filename = req.body.filename;
 
-router.get('/generateartistalbum',(req, res, next)=>{
-  let sqlArtist = `SELECT id, title FROM artist`;
-  let response = [];
-  db.query(sqlArtist).then((resultArtist)=>{
-    Array.from(resultArtist).forEach((artist)=>{
-      db.query('SELECT * FROM album WHERE artist_id=?',[artist['id']]).then((result=>{
-        if(result.length === 0){
-          let title = `Tuyển tập những bài hát hay nhất của ${artist['title']}`;
-          albumSlug = `${slug(title,"-")}-${new Date().getMilliseconds()}`;
-          response.push(`${title} = ${slug}`);
-          db.query(`INSERT album(title,artist_id,slug) VALUES(?,?,?)`,[title,artist['id'], albumSlug]).then(()=>{
-            
-          }).catch(err=>{
-            res.send(err);
-          })
-        }
-      })).catch(err=>{
-        res.send(err);
-      }).then(()=>{
-        res.send(response.join("\n"))
+      let rawData = base64.split(";base64,").pop();
+      fs.writeFile(`public/upload/images/${filename}`,rawData, {encoding: "base64"},(err)=>{
+
       })
-    })
-  }).catch((err)=>{
-    res.send(err);
-  }).then(()=>{
-    res.send(response.join("\n"));
-  })
+      const sqlUpdate = `UPDATE album SET thumbnail=? WHERE id= ?`;
+      db.query(sqlUpdate,[filename, req.body.albumid]).then(result => {
+        res.send({message: `Update avatar for album ${req.body.albumname} successfully.`});
+      }).catch(err =>{
+        res.send({error: {message: String(err)}});
+      })
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a file."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
 })
 
-router.get('/generatecategoryalbum',(req, res, next)=>{
-  let sqlCategory = `SELECT id, title FROM category`;
-  let response = [];
-  db.query(sqlCategory).then((resultCategory)=>{
-    Array.from(resultCategory).forEach((cat)=>{
-      db.query('SELECT * FROM album WHERE cat_id=?',[cat['id']]).then((result=>{
-        if(result.length === 0){
-          console.log(cat.id);
-          let title = `Tuyển tập ${cat['title']}`;
-          albumSlug = `${slug(title,"-")}-${new Date().getMilliseconds().toString()}-${crypto.randomBytes(6).toString("hex")}`;
-          response.push(`${title} = ${albumSlug}`);
-          db.query(`INSERT album(title,cat_id,slug) VALUES(?,?,?)`,[title,cat['id'], albumSlug]).then(()=>{
-            console.log(title);
-          })
-        }
-      }))
-    })
-  }).catch((err)=>{
-    res.send(err);
-  }).then(()=>{
-    res.send(response.join("\n"));
-  })
+router.post('/updatealbum', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.album){
+      let sqlUpdate = `UPDATE album SET
+       title = ?,thumbnail=?,
+       slug = ?,
+       cat_id=?,
+       artist_id=?
+         WHERE id=?`;
+
+      try{
+            let album = req.body.album;
+            await db.query(sqlUpdate,[
+              album.title,
+              album.thumbnail,
+              album.slug,
+              album.cat_id,
+              album.artist_id,
+              album.id
+            ]);
+            res.send({message: `Updated album named ${album.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a album id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
 })
 
-// router.get('/database/maplyricsfrommusictabletolyricstable',async (req,res,next)=>{
-//   let sqlMusic = `SELECT * FROM music`;
-//   let sqlInsertToLyrics;
-//   try{
-//     let resultMusic = await db.query(sqlMusic);
-//     Array.from(resultMusic).forEach( async (music)=>{
-//       sqlInsertToLyrics = `INSERT lyrics(songid,userid,lyric)VALUES(?,1,?)`;
-      
-//       try{
-//         let result = await db.query(sqlInsertToLyrics,[music.id,music.lyrics]);
-//         console.log(result);
-//       }
-//       catch(err){
-//         console.log(err);
-//       }
-//     })
-//   }
-//   catch(err){
-//     console.log(err);
-//   }
+router.post('/deletealbum', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.albumid){
+      let sqlEnableForeignKeyChecks = 'SET FOREIGN_KEY_CHECKS=1'; // to re-enable them
+      let sqlDelete = `SET FOREIGN_KEY_CHECKS=0; DELETE FROM album WHERE id=? LIMIT 1`;
 
-//   res.send("Ok");
-// })
+      try{
+        await db.query(sqlDelete,[req.body.albumid]);
+        res.send({message: `Deleted album named ${req.body.albumname} from system.`});
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a album id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
 
+router.post('/changesongthumbnail', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.filename && req.body.base64Image && req.body.songid){
+      let base64 = req.body.base64Image;
+      let filename = req.body.filename;
+
+      let rawData = base64.split(";base64,").pop();
+      fs.writeFile(`public/upload/musics/thumbnails/${filename}`,rawData, {encoding: "base64"},(err)=>{
+
+      })
+      const sqlUpdate = `UPDATE music SET thumbnail=? WHERE id= ?`;
+      db.query(sqlUpdate,[filename, req.body.songid]).then(result => {
+        res.send({message: `Update avatar for song ${req.body.songname} successfully.`});
+      }).catch(err =>{
+        res.send({error: {message: String(err)}});
+      })
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a file."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.get('/category', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    let sqlSelectCategory = `SELECT * FROM category ORDER BY id DESC`;
+    db.query(sqlSelectCategory).then(resultCategory => {
+      res.send(resultCategory);
+    }).catch((err)=>{
+      res.send({error: {message: String(err)}});
+    })
+  }
+  else{
+    res.send({error: {message: "Yout not permit to see category infomation. Please login as admin."}})
+  }
+})
+
+router.post('/updatecategory', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.category){
+      let sqlUpdate = `UPDATE category SET
+       title = ?,thumbnail=?,
+       slug = ?
+         WHERE id=?`;
+
+      try{
+            let category = req.body.category;
+            await db.query(sqlUpdate,[
+              category.title,
+              category.thumbnail,
+              category.slug,
+              category.id
+            ]);
+            res.send({message: `Updated category named ${category.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a category id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.post('/deletecategory', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.categoryid){
+      let sqlEnableForeignKeyChecks = 'SET FOREIGN_KEY_CHECKS=1'; // to re-enable them
+      let sqlDelete = `SET FOREIGN_KEY_CHECKS=0; DELETE FROM category WHERE id=? LIMIT 1`;
+
+      try{
+        await db.query(sqlDelete,[req.body.categoryid]);
+        res.send({message: `Deleted category named ${req.body.categoryname} from system.`});
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a category id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+router.post('/addcategory', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.category){
+      let sqlInsert = `INSERT INTO category(title, thumbnail, slug) VALUES(?,?,?)`;
+
+      try{
+            let category = req.body.category;
+            await db.query(sqlInsert,[
+              category.title,
+              category.thumbnail,
+              `${category.slug}.${new Date().getTime()}`
+            ]);
+            res.send({message: `Added category named ${category.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a category id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.post('/changecategorythumbnail', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.filename && req.body.base64Image && req.body.categoryid){
+      let base64 = req.body.base64Image;
+      let filename = req.body.filename;
+
+      let rawData = base64.split(";base64,").pop();
+      fs.writeFile(`public/upload/images/${filename}`,rawData, {encoding: "base64"},(err)=>{
+
+      })
+      const sqlUpdate = `UPDATE category SET thumbnail=? WHERE id= ?`;
+      db.query(sqlUpdate,[filename, req.body.categoryid]).then(result => {
+        res.send({message: `Update avatar for song ${req.body.categoryname} successfully.`});
+      }).catch(err =>{
+        res.send({error: {message: String(err)}});
+      })
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a file."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
+
+router.post('/addartist', async (req, res, next)=>{
+  if(req.user && req.user.role === ROLE.ADMIN){
+    if(req.body.artist){
+      let sqlInsert = `INSERT INTO artist(title, thumbnail, slug) VALUES(?,?,?)`;
+
+      try{
+            let artist = req.body.artist;
+            await db.query(sqlInsert,[
+              artist.title,
+              artist.thumbnail,
+              `${artist.slug}.${new Date().getTime()}`
+            ]);
+            res.send({message: `Added artist named ${artist.title} successfully.`});
+
+      }catch(err){
+        res.send({error: {message: String(err)}});
+      }
+    }
+    else{
+      res.status(403).send({error: {message: "Bad Request. You must to provide a artist id."}});
+    }
+  }
+  else{
+    res.send({error:{message: "You not permit to perform this action."}});
+  }
+})
 module.exports = router;

@@ -28,6 +28,7 @@ export class ForgetPasswordTemplate extends Component {
                 "username": this.state.username
             })
         }).then((res)=>{
+            
             return res.json();
         }).then((dataRes)=>{
             console.log(dataRes);
@@ -41,9 +42,7 @@ export class ForgetPasswordTemplate extends Component {
             this.props.showMessage(true,String(err),"danger");
         }).then(()=>{
             this.props.toggleLoading(false);
-            setTimeout(()=>{
-                this.props.showMessage(false);
-            },2000)
+           
         })
     }
     render() {

@@ -39,9 +39,7 @@ export class ProfileSetting extends Component {
             this.props.showMessage(true,String(err),"danger",{x:"40%",y:"60%"});  
         }).then(()=>{
             this.props.toggleLoading(false);
-            setTimeout(()=>{
-                this.props.showMessage(false);      
-            },500);
+           
         })
     }
     handleAvatarInput = (ev) => {
@@ -139,8 +137,9 @@ export class ProfileSetting extends Component {
                                 <div className="account-info d-flex">
                                     <h4>Password</h4>
                                     <div className="d-flex">
-                                    <h4 className="me-5">{this.state.user.password}</h4>
-                                    <span onClick={this.toggleChangePasswordPopup} role="button">Change password</span>
+                                    {this.state.user.email !== this.state.user.username &&<><h4 className="me-5">{this.state.user.password}</h4>
+                                    <span onClick={this.toggleChangePasswordPopup} role="button">Change password</span></>}
+                                    {this.state.user.email === this.state.user.username && <span className="text-warning">You are login by Social Media Platform</span>}
                                     </div>
                                     
                                 </div>

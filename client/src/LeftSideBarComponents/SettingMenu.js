@@ -22,7 +22,7 @@ export class SettingMenu extends Component {
     render(){
         return(
             <ul ref={this.detectClickOutside} className="list-group bg-dark settingmenu">
-                <Theme></Theme>
+                
                 {localStorage.getItem("userid") !== null && <LogoutButton {...this.props}></LogoutButton>}
             </ul>
         )

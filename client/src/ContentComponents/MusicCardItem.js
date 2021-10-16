@@ -25,7 +25,11 @@ export class MusicCardItem extends Component {
                                 
 
                                 <div className="overlay">
-                                    <span onClick={(ev)=>{console.log(this.props.music.music_slug,"Set");this.props.requestPlayMusicFromSlug(this.props.music.music_slug)}} data-music-slug={this.props.music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={this.props.music.music_slug} className="fas fa-play-circle"></i></span>
+
+                                <span 
+            onClick={(ev)=>{this.props.requestPlayMusicFromSlug(this.props.music.music_slug)}} 
+            data-music-slug={this.props.music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={this.props.music.music_slug} className="fas fa-play-circle"></i></span>
+                                
                                 </div>
                             </div>
                            

@@ -87,10 +87,7 @@ export class ResetPasswordForm extends Component {
                     this.props.showMessage(true,String(err),'warning');
                 }).then(()=>{
                     this.props.toggleLoading(false);
-                    setTimeout(()=>{
-                        this.props.showMessage(false);
-                        
-                    },5000);
+                    
                     this.props.history.push('/login');
                 })
             }

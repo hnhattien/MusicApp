@@ -13,7 +13,7 @@
     padding-right: 10px;
 }
 .profile-link-wrap:hover{
-    
+
     background-color: rgba(10, 10, 10, 0.1);
 
 }
@@ -30,16 +30,16 @@
 
 .upload-link{
     font-size: 2rem;
-    
+
     margin: auto;
 }
 
 .upload-link-wrap{
-    position: fixed;
-    bottom: 10px;
+
     width: 100%;
-    text-align: left;
-    margin-left: 10px;
+    margin-top: 20px;
+    text-align: right;
+    padding-right: 20px;
 }
 
 .all-tool-wrap{

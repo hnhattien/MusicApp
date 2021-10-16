@@ -60,9 +60,7 @@ export class SearchTemplate extends Component {
                 this.props.showMessage(true,String(err),"danger");
             }).then(()=>{
                 this.props.toggleLoading(false);
-                setTimeout(()=>{
-                    this.props.showMessage(false);
-                },1000);
+               
             })
         }
         else{

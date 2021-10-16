@@ -3,6 +3,57 @@ import React, { Component } from 'react';
 import { PlayerBottom } from './PlayerBottom';
 import './musicplayer.css';
 import { PlayerTop } from './PlayerTop';
+import styled from 'styled-components';
+const MusicPlayerStyle = styled.div`
+.setting-menu-wrap{
+    z-index: 1000;
+    background-color: rgb(33, 37, 41) !important;
+}
+.setting-menu-wrap ul{
+    width: 200px;
+    height: fit-content
+}
+.setting-menu-wrap ul li{
+    background-color: rgb(33, 37, 41,0.2) !important;
+}
+.profile-link-wrap{
+    padding-right: 10px;
+}
+.profile-link-wrap:hover{
+    
+    background-color: rgba(10, 10, 10, 0.1);
+
+}
+.avatar-thumbnail-wrap{
+    position: relative;
+    right: 10px;
+    bottom: 2px;
+}
+
+.avatar-thumbnail{
+    width: 20px;
+    height: 20px;
+}
+
+.upload-link{
+    font-size: 2rem;
+    
+    margin: auto;
+}
+
+.upload-link-wrap{
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: left;
+    margin-left: 10px;
+}
+
+.all-tool-wrap{
+    position: relative;
+}
+
+`
 export class PlayerTemplate extends Component {
     constructor(props) {
         super(props);
@@ -33,14 +84,9 @@ export class PlayerTemplate extends Component {
 
                         </PlayerTop>
 
-                        <PlayerBottom {...this.props} toggleCurrentPlaylist={this.toggleCurrentPlaylist} {...this.props}>
+                        <PlayerBottom isHearted={currentMusic.liked} {...this.props} toggleCurrentPlaylist={this.toggleCurrentPlaylist} {...this.props}>
 
                         </PlayerBottom>
-                        {/* {console.log("Music1",currentMusic,"Ref",this.audioRef,this.props.isPlay)} */}
-
-
-
-
                     </div>
                 
             </React.Fragment> : ""

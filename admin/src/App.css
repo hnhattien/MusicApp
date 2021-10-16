@@ -1,0 +1,125 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.info-admin-top-list{
+  display: flex;
+  justify-content: space-around;
+}
+.info-admin-top-list li{
+  border-radius: 10px;
+  display: block;
+  width: 25%;
+  height: 91px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.info-admin-top-list li .thumbnail, .notify .thumbnail{
+  width: 48px;
+  height: 48px;
+  background-image: linear-gradient(
+    310deg, rgb(33, 82, 255), rgb(33, 212, 253));
+  color: white !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+}
+.info-admin-top-list li {
+  color: rgb(52, 71, 103) !important;
+}
+.info-admin-top-list li .percent{
+  font-size: 0.6em;
+  font-weight: 900;
+  margin-left: 5px;
+  color: rgb(130, 214, 22);
+}
+
+.remove-button-wrap{
+   display: flex;
+   justify-content: space-between;
+}
+
+.react-confirm-alert-button-group button:nth-child(1){
+  background-color: brown;
+}
+
+li .notify {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+li .notify .content .title{
+  font-size: 0.9em;
+}
+li .notify .content{
+   display: flex;
+   flex-direction: column;
+
+}
+li .notify .content .time{
+  font-size: 0.7em;
+}
+
+li.unseen{
+
+    background-color: rgba(0,0,0,0.1);
+
+}
+
+li.seen{
+  background-color: unset;
+}
+.notifications-bell-wrap{
+  position: relative;
+}
+.notifications-badge{
+  position: absolute;
+  top: 0;
+  left: 15px;
+  z-index: 1000;
+  background: red;
+
+}
+
+.bell-btn{
+  position: relative;
+  font-size: 2em;
+}

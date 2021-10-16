@@ -4,7 +4,8 @@ const pool = mysql.createPool({
     host: "localhost",
     user: 'root',
     password: "",
-    database: "MusicSE447"
+    database: "MusicSE447",
+    multipleStatements: true
 })
 pool.getConnection((err,connection) =>{
   if(err){

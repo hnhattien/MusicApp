@@ -16,7 +16,7 @@ export class MusicCardList extends Component {
                         <MusicCardItem  music={music} {...this.props}>
 
                         </MusicCardItem>
-                        {!this.props.isInlineList && <ActionOnMusicTemplate music={music} isHearted={music.liked === true ? true : false} {...this.props}></ActionOnMusicTemplate>}
+                        {!this.props.isInlineList && !this.props.isHideHeart && <ActionOnMusicTemplate music={music} isHearted={music.liked === true ? true : false} {...this.props}></ActionOnMusicTemplate>}
                     </li>
     
     

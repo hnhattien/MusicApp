@@ -41,9 +41,7 @@ export class Profile extends Component {
         }).catch(err => {
             this.props.showMessage(true,String(err),"danger");
         }).then(()=>{
-            setTimeout(() => {
-                this.props.showMessage(false);
-            }, 1000);
+            
         })
     }
     

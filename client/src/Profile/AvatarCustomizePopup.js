@@ -78,9 +78,7 @@ export class AvatarCustomizePopup extends Component {
                     this.props.toggleAvatarCustomizeMenu();
                     this.props.updateUserChanges();
                     this.props.history.push("/profile/setting");
-                    setTimeout(()=>{
-                        this.props.showMessage(false);  
-                    }, 500)
+                    
                 })
             })
         }

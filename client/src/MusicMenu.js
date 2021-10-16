@@ -16,7 +16,7 @@ export class MusicMenu extends React.Component {
             <Search  style={this.state.style} className={'list-group-item py-3'}></Search>
             <Home  style={this.state.style} className={'list-group-item py-3'}></Home>
             <Discover  style={this.state.style} className={'list-group-item py-3'}></Discover>
-            <Rank style={this.state.style} className="list-group-item py-3"></Rank>
+            {/* <Rank style={this.state.style} className="list-group-item py-3"></Rank> */}
         </ul>
             
                 

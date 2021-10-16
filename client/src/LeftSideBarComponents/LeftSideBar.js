@@ -9,8 +9,9 @@ export class LeftSideBar extends Component{
         super(props);
     }
     render(){
+      let displaySideBarClass = this.props.isShowSideBar ? 'show' : 'hide';
         return(
-            <div className="col-2 all-tool-wrap d-none d-sm-block menu-wrap fixed-width left-side-bar vh-100 top-0 bg-dark p-0">
+            <div className={`${displaySideBarClass} col-2 all-tool-wrap d-none d-sm-block menu-wrap fixed-width left-side-bar vh-100 top-0 bg-dark p-0`}>
                  <Logo>
                  </Logo>
                  <MemberToolMenu {...this.props}>

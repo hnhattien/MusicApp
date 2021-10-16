@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { TimeLine } from './TimeLine';
 
 import {PlayerControl} from './PlayerControl';
-import VolumeControl from './VolumeControl';
+import ExtraOptionButton from './ExtraOptionButton';
 import ShowCurrentPlaylistButton from './ShowCurrentPlaylistButton';
 import ActionOnMusicTemplate from '../ContentComponents/ActionOnMusicTemplate';
 export class PlayerBottom extends Component {
@@ -20,7 +20,7 @@ export class PlayerBottom extends Component {
                 <div className="extra-function-tool-bar-wrap position-relative">
                     <ul className="extra-tool-list list-inline d-flex justify-content-around">
                         <li className="list-inline-item">
-                          <VolumeControl></VolumeControl>   
+                          <ExtraOptionButton {...this.props}></ExtraOptionButton>
                         </li>
                         <li className="list-inline-item">
                           <ShowCurrentPlaylistButton toggleCurrentPlaylist={this.props.toggleCurrentPlaylist}>

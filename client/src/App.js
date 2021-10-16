@@ -1,7 +1,7 @@
 // eslint-disable-next-line
-import logo from './logo.svg';
+
 import React, { Component } from 'react';
-import {BrowserRouter as Router, NavLink, Route, Redirect, Switch} from 'react-router-dom';
+import {BrowserRouter as Router, NavLink} from 'react-router-dom';
 import './App.css';
 import {RightSideBar} from './RightSideBar';
 import {LeftSideBar} from './LeftSideBarComponents/LeftSideBar';
@@ -9,10 +9,12 @@ import { MainContent } from './MainContent';
 import {MessageBox} from './MessageComponents/MessageBox';
 import {Loading} from './LoadingComponents/Loading';
 
+
 export class App extends Component {
   constructor(props){
     super(props);
     this.audioRef = React.createRef();
+    this.showSideBarButtonRef = React.createRef();
     this.state = {
       user: {
         nickname: '',
@@ -29,6 +31,7 @@ export class App extends Component {
       duration: 0,
       newMusics: [],
       playlist: [],
+      isShowSideBar: false,
       //Loading
       loading: {
         isLoad: false,
@@ -39,22 +42,14 @@ export class App extends Component {
         isShowMessage: false,
         messageProps: {type:"success",text: "", position: {x: "50%", y: "50%"}},
       }
-      
+
     }
   }
-  
+
   //Remember scroll
 
-  componentDidMount = () => {
-    window.addEventListener("scroll",this.rememberScroll,true)
-  }
 
-  rememberScroll = () => {
-    const scrollLength = document.body.scrollTop || document.documentElement.scrollTop;
-    console.log(scrollLength, "Length")
-    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-    console.log(height,"Heigh")
-  }
+
 
 
 
@@ -68,7 +63,7 @@ export class App extends Component {
   //   }).then(data=>{
   //     console.log(data)
   //     if(data.user){
-        
+
   //       this.setState({user: data.user});
   //     }
   //     else{
@@ -78,7 +73,7 @@ export class App extends Component {
   //     console.log(err);
   //   })
   // }
-  
+
   setPlaylist = (data)=>{
     this.setState({playlist: data},()=>{
       this.toggleLoading(false);
@@ -104,10 +99,10 @@ export class App extends Component {
   //           console.log(this.state.newMusics)
   //         })
   //       }
-       
+
   //       this.setPlaylist([...data['musics'].reverse()])
-       
-  //     }     
+
+  //     }
   //   })
   // }
   updateHeartChanges = (changedMusic)=>{
@@ -119,8 +114,8 @@ export class App extends Component {
         return music;
       }
     })
-      
-    
+
+
     this.setState({
       playlist: newPlaylist
     })
@@ -159,29 +154,29 @@ export class App extends Component {
         },3000);
       })
     }else{
-      
+
       let targetMusic = musicFromPlaylist[0];
       this.setCurrentMusic(targetMusic);
       console.log(targetMusic,"targetd")
       console.log(slug,"Request")
     }
-    
+
   }
   playMusic = ()=>{
     if(this.state.currentMusic){
       this.audioRef.current.src = `/upload/musics/audio/${this.state.currentMusic.audio}`;
       this.setPlayState();
-      
+
     }
   }
 setDuration = ()=>{
-  
+
     if(this.audioRef.current){
       this.setState({duration: this.audioRef.current.duration});
-     
-    }  
- 
-  
+
+    }
+
+
 }
   setPlayState = ()=>{
     this.setState({isPlay: true});
@@ -197,9 +192,13 @@ setDuration = ()=>{
   }
 
   componentDidUpdate(){
+    if(this.state.currentMusic){
+      document.title = this.state.currentMusic.title + " - " +
+      `${this.state.currentMusic.artist_name}`;
+    }
     if(this.state.isPlay === true){
       if(this.audioRef.current){
-         
+
          if(this.audioRef.current.paused){
           let playPromise = this.audioRef.current.play();
 
@@ -208,13 +207,13 @@ setDuration = ()=>{
 
             }).catch(err=>{
               console.log(err);
-              
+
             });
           }
-          
+
         }
-        
-        
+
+
       }
     }
     else{
@@ -229,32 +228,32 @@ setDuration = ()=>{
               console.log(err);
             });
           }
-          
+
         }
-        
+
       }
     }
   }
-  
-  
+
+
 
   peekHandle = (ev)=>{
     if(this.audioRef.current){
       this.audioRef.current.currentTime = ev.target.value;
     }
   }
-  
+
   updateCurrentTime = (ev)=>{
     if(this.audioRef.current){
       this.setState({currentTime: this.audioRef.current.currentTime})
     }
-    
+
   }
   resetCurrentTime = ()=>{
     this.setState({currentTime: 0});
   }
 
-  
+
   setRandomSong = ()=>{
     let min = 0;
     let max = this.state.playlist.length;
@@ -263,7 +262,7 @@ setDuration = ()=>{
     this.setCurrentMusic(music);
   }
   forwardHandle = (ev) =>{
-      
+
     if(this.state.isRandom){
       this.setRandomSong();
     }
@@ -272,35 +271,45 @@ setDuration = ()=>{
         // }
     else{
       let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
-      if( currentMusicIndex === this.state.playlist.length - 1){
-        this.setCurrentMusic(this.state.playlist[0]);
+      if(this.getPlaylist().length > 0){
+        if( currentMusicIndex === this.state.playlist.length - 1){
+          this.setCurrentMusic(this.state.playlist[0]);
+        }
+        else{
+          let nextMusic = this.state.playlist[this.state.playlist.indexOf(this.state.currentMusic)+1];
+          this.setCurrentMusic(nextMusic);
+        }
       }
       else{
-        let nextMusic = this.state.playlist[this.state.playlist.indexOf(this.state.currentMusic)+1];
-        this.setCurrentMusic(nextMusic);   
+        if(this.audioRef && this.audioRef.current){
+          this.audioRef.current.currentTime = this.audioRef.current.duration+10;
+        }
       }
-      
+
     }
-    
-    
+
+
 
   }
   backwardHandle = (ev) =>{
 
-      
+
     if(this.state.isRandom){
       this.setRandomSong();
     }
-
     else{
-      let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
-      if( currentMusicIndex === 0){
-        this.setCurrentMusic(this.state.playlist[0]);
+      if(this.state.playlist.length > 0){
+        let currentMusicIndex = this.state.playlist.indexOf(this.state.currentMusic);
+        if( currentMusicIndex === 0){
+          this.setCurrentMusic(this.state.playlist[0]);
+        }
+        else{
+          this.setCurrentMusic(this.state.playlist[currentMusicIndex - 1]);
+        }
       }
-      else{
-        this.setCurrentMusic(this.state.playlist[currentMusicIndex - 1]);
-      }
-        
+
+
+
     }
   }
   updateViewCount = (music) => {
@@ -333,7 +342,7 @@ setDuration = ()=>{
     }
     else if(this.state.isRandom === true){
       this.setRandomSong();
-      
+
     }
     else if(this.state.playlist.length !== 0){
       // console.log(Object.keys(this.state.playlist[0]));
@@ -341,17 +350,17 @@ setDuration = ()=>{
       // this.setCurrentMusic(this.state.playlist[this.state.playlist.map(JSON.stringify).indexOf(JSON.stringify(this.state.currentMusic))+1]);
       this.forwardHandle(ev);
       console.log("Set music")
-    } 
+    }
     else{
       this.setPauseState();
-    } 
+    }
   }
   //User
   setLoginState = (user) => {
     console.log(user);
     this.setState({user: {nickname: user.nickname, avatar: user.avatar}});
   }
- 
+
   updateUserChanges = () => {
     this.toggleLoading(true);
     fetch('/auth/loginstatus').then(res=>{
@@ -375,16 +384,16 @@ setDuration = ()=>{
       },500)
     })
   }
-  checkLoginStatus = () => {
+
+  updateLoginStatus = () => {
     this.toggleLoading(true);
     fetch('/auth/loginstatus').then(res=>{
       return res.json();
     }).then(data=>{
-      console.log(data);
       if(data.isLogin === true){
         localStorage.setItem("userid",data.id);
-        console.log(data)
-        this.setState({user:{nickname: data.nickname,avatar: data.avatar}});
+        this.setState({user:{nickname: data.nickname,avatar: data.avatar}},()=>{
+        });
       }
       else{
         localStorage.removeItem("userid");
@@ -398,13 +407,66 @@ setDuration = ()=>{
       },2000)
     })
   }
+  toggleSideBar = (ev) => {
+      this.setState({
+        isShowSideBar: !this.state.isShowSideBar
+      })
+  }
+
+  registerOpacityHandleShowSideBarButtonForMobile = () => {
+    if(window.screen.width <= 576){
+      let hideTimer = null;
+      console.log(this.showSideBarButtonRef);
+      /*if(this.showSideBarButtonRef && this.showSideBarButtonRef.current){
+        this.showSideBarButtonRef.current.addEventListener("click",()=>{
+          this.showSideBarButtonRef.current.classList.add("show");
+          clearTimeout(hideTimer);
+          alert("hi");
+        })
+        this.showSideBarButtonRef.current.addEventListener("mouseover",()=>{
+          this.showSideBarButtonRef.current.classList.add("show");
+          clearTimeout(hideTimer);
+          alert("hi");
+        })
+      }*/
+      document.addEventListener("scroll",()=>{
+          if(this.showSideBarButtonRef && this.showSideBarButtonRef.current){
+            this.showSideBarButtonRef.current.classList.add("show");
+            this.showSideBarButtonRef.current.classList.remove("hide");
+          }
+          if(hideTimer !== null){
+            setTimeout(()=>{
+              clearTimeout(hideTimer);
+            },1000);
+            hideTimer = null;
+          }
+          else{
+            hideTimer = setTimeout(()=>{
+              if(this.showSideBarButtonRef && this.showSideBarButtonRef.current){
+                this.showSideBarButtonRef.current.classList.remove("show");
+                this.showSideBarButtonRef.current.classList.add("hide");
+
+              }
+            },5000)
+          }
+      })
+    }
+  }
   componentDidMount = () => {
-    this.checkLoginStatus();
+    this.updateLoginStatus();
+    this.registerOpacityHandleShowSideBarButtonForMobile();
   }
   setLogoutState = () => {
     this.setState({isLogin: false});
   }
-  
+  getAudioElement = () => {
+    if(this.audioRef){
+      return this.audioRef.current;
+    }
+    else{
+      return null;
+    }
+  }
   //Loading
   toggleLoading = (isLoad,position={x:"50%",y:"50%"}) => {
     this.setState({loading: {isLoad: isLoad, position}});
@@ -413,56 +475,83 @@ setDuration = ()=>{
   showMessage = (isShowMessage,text="",type,position={x:"50%",y:"50%"}) => {
     this.setState({messageAlert: {isShowMessage,messageProps:{text,type,position}}});
   }
+  setAdminPage = (isAdminPage) => {
+    this.setState({
+      isAdminPage
+    })
+  }
   render(){
-    
+    console.log(this.state.playlist);
+    let iconLeftSideBarClass = this.state.isShowSideBar ? 'fa-chevron-left' : 'fa-chevron-right';
     return (
       <Router>
-     
-      <div className="container-fluid bg-dark">
-        {this.state.loading.isLoad && <Loading position={this.state.loading.position}></Loading>}
-        {this.state.messageAlert.isShowMessage && <MessageBox text={this.state.messageAlert.messageProps.text} position={this.state.messageAlert.messageProps.position} type={this.state.messageAlert.messageProps.type}></MessageBox>}  
-        <div className="row position-relative">
-        
-      <LeftSideBar updateUserChanges={this.updateUserChanges} user={this.state.user} logoutUser={this.logoutUser} toggleLoading={this.toggleLoading} showMessage={this.showMessage} />
-      <MainContent
-      updateHeartChanges={this.updateHeartChanges}
-      updateUserChanges={this.updateUserChanges} 
-      setCurrentMusic={this.setCurrentMusic}
-      user={this.state.user} 
-      toggleLoading={this.toggleLoading} 
-      showMessage={this.showMessage} 
-      setLoginState={this.setLoginState} 
-      setLogoutState={this.setLogoutState} 
-      setPlaylist={this.setPlaylist} 
-      getPlaylist={this.getPlaylist} 
-      requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}/>
 
-      <RightSideBar 
-      updateHeartChanges={this.updateHeartChanges}
-      showMessage={this.showMessage}
-      peekHanlde={this.peekHandle}
-      isPlay={this.state.isPlay} 
-      isLoop={this.state.isLoop} 
-      isRandom={this.state.isRandom} 
-      getCurrentMusic={this.getCurrentMusic}
-      setPlayState={this.setPlayState}
-      setPauseState={this.setPauseState}
-      toggleLoop={this.toggleLoop}
-      toggleRandom={this.toggleRandom}
-      currentTime={this.state.currentTime}
-      duration={this.state.duration}
-      cancelMouseHold={this.cancelMouseHold}
-      forwardHandle={this.forwardHandle}
-      getPlaylist={this.getPlaylist}
-      backwardHandle={this.backwardHandle}
-      currentMusic={this.state.currentMusic}
-      requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}
-      />
+        <div className="container-fluid bg-dark">
+          <div className="home-btn-wrap">
+             <NavLink to={'/'}><span role="button" className="fas fa-home home-btn"></span></NavLink>
+          </div>
+          <div ref={this.showSideBarButtonRef} onMouseMove={(ev)=>{
+            ev.target.classList.add("show");
+            ev.target.classList.remove("hide");
+          }} className="show-nav-bar-button-wrap">
+             <span role="button" onClick={this.toggleSideBar} className={`fas ${iconLeftSideBarClass}`}>
+             </span>
+          </div>
 
+          {this.state.loading.isLoad && <Loading position={this.state.loading.position}></Loading>}
+          {this.state.messageAlert.isShowMessage && <MessageBox showMessage={this.showMessage} text={this.state.messageAlert.messageProps.text} position={this.state.messageAlert.messageProps.position} type={this.state.messageAlert.messageProps.type}></MessageBox>}
+          <div className="row position-relative">
+
+        <LeftSideBar isShowSideBar={this.state.isShowSideBar} updateUserChanges={this.updateUserChanges} user={this.state.user} logoutUser={this.logoutUser} toggleLoading={this.toggleLoading} showMessage={this.showMessage} />
+        <MainContent
+        updateHeartChanges={this.updateHeartChanges}
+        updateUserChanges={this.updateUserChanges}
+        setCurrentMusic={this.setCurrentMusic}
+        user={this.state.user}
+        toggleLoading={this.toggleLoading}
+        showMessage={this.showMessage}
+        setLoginState={this.setLoginState}
+        setLogoutState={this.setLogoutState}
+        setPlaylist={this.setPlaylist}
+        getPlaylist={this.getPlaylist}
+        requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}
+        updateLoginStatus={this.updateLoginStatus}
+        getAudioElement={this.getAudioElement}
+        getCurrentMusic={this.getCurrentMusic}
+        />
+
+        <RightSideBar
+        updateHeartChanges={this.updateHeartChanges}
+        showMessage={this.showMessage}
+        peekHanlde={this.peekHandle}
+        isPlay={this.state.isPlay}
+        isLoop={this.state.isLoop}
+        isRandom={this.state.isRandom}
+        getCurrentMusic={this.getCurrentMusic}
+        setPlayState={this.setPlayState}
+        setPauseState={this.setPauseState}
+        toggleLoop={this.toggleLoop}
+        toggleRandom={this.toggleRandom}
+        currentTime={this.state.currentTime}
+        duration={this.state.duration}
+        cancelMouseHold={this.cancelMouseHold}
+        forwardHandle={this.forwardHandle}
+        getPlaylist={this.getPlaylist}
+        backwardHandle={this.backwardHandle}
+        currentMusic={this.state.currentMusic}
+        requestPlayMusicFromSlug={this.requestPlayMusicFromSlug}
+        />
+
+          </div>
+          <audio onError={(ev) => {
+            this.forwardHandle(ev);
+            this.showMessage(true,"Mp3 file error.","danger");
+          }} onEnded={this.endedHandle} onTimeUpdate={this.updateCurrentTime} onLoadedMetadata={this.setDuration}  loop={this.props.isLoop} ref={this.audioRef}> </audio>
         </div>
-        <audio onError={this.forwardHandle} onEnded={this.endedHandle} onTimeUpdate={this.updateCurrentTime} onLoadedMetadata={this.setDuration}  loop={this.props.isLoop} ref={this.audioRef}> </audio> 
-      </div>
+
+
       </Router>
+
     );
   }
 }

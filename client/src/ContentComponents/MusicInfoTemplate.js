@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { NavLink, withRouter } from 'react-router-dom';
 import './musicinfo.css';
+import {PROXY_PATH} from '../config';
 export class MusicInfoTemplate extends Component {
     constructor(props){
         super(props);
@@ -14,11 +15,10 @@ export class MusicInfoTemplate extends Component {
             isEditLyrics: false
         }
     }
- 
-    
+
+
     initialGetDataInterval = () => {
         return setTimeout(()=>{
-            console.log("Hi") ;
             this.getInfoMusic();
             if(this.state.music !== null){
                 clearInterval(this.state.getDataInterval)
@@ -32,25 +32,39 @@ export class MusicInfoTemplate extends Component {
             })
         }
     }
+    componentWillMount = () => {
+        this.unListen = this.props.history.listen((location, action)=> {
+            setTimeout(()=>{
+                this.getInfoMusic()
+            },100)
+        })
+    }
+
+    componentWillUnmount = () => {
+       this.unListen();
+       clearInterval(this.state.getDataInterval);
+       this.setState({
+           getDataInterval: null
+       })
+    }
     getInfoMusic = ()=>{
         this.props.toggleLoading(true);
         let slug = this.props.musicSlug;
-        console.log(this.props);
         fetch(`${slug}`).then((res)=>{
             return res.json();
         }).then(dataRes=>{
-            console.log(dataRes);
+          console.log(dataRes,"skldaksd;ksa;d;sad;ls;lda;l");
            if(dataRes.error){
                this.setState({
                    error: dataRes.error.message
                })
-           } 
+           }
            else{
                //Response is object
-             this.setState({music: dataRes});    
+             this.setState({music: dataRes});
            }
         }).catch(err=>{
-           this.setState({error: err});            
+           this.setState({error: err});
         }).then(()=>{
             this.props.toggleLoading(false);
         })
@@ -58,16 +72,16 @@ export class MusicInfoTemplate extends Component {
     showEditLyrics = (ev) => {
 
        if(!this.state.isEditLyrics){
-           
-           
+
+
             this.setState({
                 isEditLyrics: true,
-                oldLyrics: this.lyricsInputRef.current.textContent           
+                oldLyrics: this.lyricsInputRef.current.textContent
             },()=>{
                 if(this.lyricsInputRef){
                     this.lyricsInputRef.current.focus();
                     let range = new Range();
-                    
+
                     let selection = window.getSelection();
                     if(this.lyricsInputRef.current.firstChild){
                         range.setStart(this.lyricsInputRef.current.firstChild,this.lyricsInputRef.current.textContent.length);
@@ -76,14 +90,14 @@ export class MusicInfoTemplate extends Component {
                         selection.addRange(range)
                     }
                     this.lyricsInputRef.current.classList.add("form-control");
-                    
+
                 }
             })
        }
        else{
            //Save Lyrics
          if(this.lyricsInputRef){
-            
+
             this.props.toggleLoading(true);
             fetch('/song/updatelyrics',{
                 method: "POST",
@@ -98,7 +112,6 @@ export class MusicInfoTemplate extends Component {
             }).then(res=>{
                 return res.json();
             }).then((dataRes)=>{
-                console.log(dataRes,"Hi kei");
                if(dataRes.isRequiredLogin){
                 this.props.showMessage(true, String(dataRes.error.message), "danger");
                 this.props.history.push("/login");
@@ -117,12 +130,12 @@ export class MusicInfoTemplate extends Component {
                 console.log(err);
             }).then(()=>{
                 this.props.toggleLoading(false);
-                setTimeout(()=>{
-                    this.props.showMessage(false);
-                },2000);
+                // setTimeout(()=>{
+                //     this.props.showMessage(false);
+                // },4000);
             })
          }
-           
+
        }
     }
     copyHandle = (ev) => {
@@ -133,37 +146,59 @@ export class MusicInfoTemplate extends Component {
             selection.selectAllChildren(this.lyricsInputRef.current)
             document.execCommand("copy");
             this.props.showMessage(true,"Copied","success");
-            setTimeout(()=>{
-                this.props.showMessage(false);
-            },2000)
+
         }
-        
-    } 
+
+    }
     hideEditLyrics = (ev) => {
         this.setState({
-            isEditLyrics: false           
+            isEditLyrics: false
         },()=>{
             this.lyricsInputRef.current.classList.remove("form-control");
             this.lyricsInputRef.current.textContent=this.state.oldLyrics;
         })
     }
+    downloadSong = async (fileName) => {
+
+          let a = document.createElement("a");
+          let audioUrl = `${PROXY_PATH}upload/musics/audio/${this.state.music.audio}`;
+          let blob = await fetch(audioUrl).then((res)=>{
+              return res.blob();
+          })
+          let fileReader = new FileReader();
+          fileReader.readAsDataURL(blob);
+          fileReader.onload = (ev) => {
+            a.href = ev.target.result;
+            a.download = fileName+"SE447-Music-App.mp3";
+            a.click();
+          }
+
+
+    }
     render(){
+        console.log(this.props.getPlaylist())
         if(this.state.error){
             return <h1>{this.state.error.message}</h1>;
         }
+        else if(this.state.music && Object.keys(this.state.music).length === 0 ){
+          return <h1>Not Found Music</h1>
+        }
         else if(this.state.music){
-            
+
                 let music = this.state.music;
                 return <div className="music-info-wrap container-fluid">
-                    
+
                     <div className="row">
                         <div className="col-12 music-top-info d-flex">
                             <div className="music-thumbnail-wrap me-4 position-relative">
                                 <img onError={(ev)=>{ev.target.error = null; ev.target.src="/upload/musics/thumbnails/default.png"}} className=' info-music-thumbnail rounded img-fluid' src={`/upload/musics/thumbnails/${music.music_thumbnail}`}></img>
                                 <div className="overlay position-absolute top-0">
                                 <span onClick={(ev)=>{this.props.requestPlayMusicFromSlug(music.music_slug);}} data-music-slug={music.music_slug} className="play-music-icon-overlay play-music" ><i data-music-slug={music.music_slug} className="fas fa-play-circle"></i></span>
+
                                 </div>
+
                             </div>
+
                             <div className="music-info-wrap">
                                 <div className="info-music-title">
                                    <span className="text-muted me-2">Song name: </span>
@@ -183,9 +218,11 @@ export class MusicInfoTemplate extends Component {
                                         {new Date(music.upload_time).toLocaleDateString()}
                                     </span>
                                 </div>
+
                             </div>
                         </div>
                     </div>
+                    <button onClick={(ev) => {this.downloadSong(music.title)}} className="btn donwload-btn btn-light ms-2">Download this song</button>
                     <div className="row mt-5">
                         <div className="col-12 lyrics-wrap">
                             <div className="lyrics-header justify-content-between d-flex">
@@ -205,12 +242,12 @@ export class MusicInfoTemplate extends Component {
                             <div>
                             {this.state.isEditLyrics && <button className="btn btn-light m-2" onClick={this.hideEditLyrics}>Cancel</button>}
                             {(!music.lyrics && <button className="btn btn-light m-2" onClick={this.showEditLyrics}>Add lyrics</button>) || (this.state.isEditLyrics && <button className="btn btn-light m-2" onClick={this.showEditLyrics}>Add lyrics</button>)}
-                            
+
                             </div>
                         </div>
                     </div>
                 </div>
-            
+
         }
         else{
             return "";
