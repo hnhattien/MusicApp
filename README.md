@@ -2,11 +2,11 @@
 
 ## A some images in project
 
-# Technogies
-## NodeJS
-## MYSQL
-## PASSPORT
-## REACT
+## Technogies
+#### NodeJS
+#### MYSQL
+#### PASSPORT
+#### REACT
 
 I will place here link to images on Google drive. Because it quite mutiple images that I don't want to show here.
 
