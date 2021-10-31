@@ -1,1 +1,1 @@
-# Run npm run startclient
+# Run nodemon 
