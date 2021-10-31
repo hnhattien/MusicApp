@@ -1,4 +1,4 @@
-#### You need download file Musicapp.sql then run it in mysql server to generate tables and data 
+#### You need download file MusicApp.sql then run it in mysql server to generate tables and data 
 # Music App Project is created by me
 
 ## A some images in project
