@@ -2,7 +2,7 @@
 # Music App Project is created by me
 
 
-## Technogies
+## Technologies
 #### NodeJS
 #### MYSQL
 #### PASSPORT
