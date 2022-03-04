@@ -819,8 +819,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `email`, `password`, `displayedName`, `avatar`, `role`, `joinday`) VALUES
-(3049136295309495, 'tienit0105@gmail.com', 'tienit0105@gmail.com', NULL, 'Hoàng Nhật Tiến', '0a81b190fa340305a8daa46b1635479370857.jpg', 'user', '2021-10-29 03:49:30'),
-(3049136295309497, 'hello1234', 'tienit0105@gmail.com', '$2b$10$6KHnjnKDezSE8XLWmoGzHuaYdltDSfWzRTyMAL86G6h266JKMSASq', 'Kei', '163547934613898071.61820867803.jpg', 'admin', '2021-10-14 09:38:56'),
+(3049136295309495, '', '', NULL, 'Hoàng Nhật Tiến', '0a81b190fa340305a8daa46b1635479370857.jpg', 'user', '2021-10-29 03:49:30'),
+(3049136295309497, 'hello1234', '', '$2b$10$6KHnjnKDezSE8XLWmoGzHuaYdltDSfWzRTyMAL86G6h266JKMSASq', 'Kei', '163547934613898071.61820867803.jpg', 'admin', '2021-10-14 09:38:56'),
 (3049136295309505, 'kei1234', 'artificialintelligence0105@gmail.com', '$2b$10$ReEdEokIoXsBLB2EwvJxxe7lImPl0wY4uRuhSI3ibhx5INjtB4z96', 'Kei', '163547934613898071.61820867803.jpg', 'user', '2021-10-28 05:08:52');
 
 --
